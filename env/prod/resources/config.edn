@@ -1,0 +1,2 @@
+{:app {:build :prod
+       :port 3000}}
