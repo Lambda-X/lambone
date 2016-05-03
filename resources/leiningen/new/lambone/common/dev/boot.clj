@@ -46,3 +46,18 @@
     namespaces (-> (update-in [:test-cljs :suite-ns] (fn [_] nil))
                    (assoc-in [:test-cljs :namespaces] namespaces))
     exit? (assoc-in [:test-cljs :exit?] exit?)))
+
+(defn build-backend
+  "Build the final artifact, if no type is passed in, it builds production.
+
+   The artifact is the result of (comp (aot) (uber) (jar)) but no target is
+   appended."
+  [options type]
+  (let [type (or type :prod)]
+    (boot/apply-options! options)
+    (comp (boot/with-pass-thru _
+            (util/info "Building backend %s profile...\n" type)
+            (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
+          (apply boot/aot (flatten (seq (:aot options))))
+          (apply boot/uber (flatten (seq (:uber options))))
+          (apply boot/jar (flatten (seq (:jar options)))))))

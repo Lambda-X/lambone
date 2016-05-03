@@ -2,31 +2,21 @@
 ;;;  Dependencies  ;;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-(def common-deps '[[degree9/boot-semver "1.2.4" :scope "test"]])
+(def common-deps '[[degree9/boot-semver "1.2.4" :scope "test"]
+                   [adzerk/env          "0.3.0" :scope "test"]                  ])
 
 (def backend-dev-deps '[])
 
 (def backend-deps '[[org.clojure/clojure "1.8.0"]
-                    [com.taoensso/timbre "4.3.1"]
-
-                    [aleph "0.4.1-beta3"]
-                    [bidi "1.24.0"]
-                    [yada "1.1.11"]
-                    [cprop "0.1.7"]
-
-                    [com.stuartsierra/component "0.3.1"]
                     [org.clojure/tools.namespace "0.2.10"]
-
-                    [reloaded.repl "0.2.1"]
-                    [prismatic/schema "1.0.4"]
-                    [org.clojure/core.async "0.2.374"]
                     [org.clojure/tools.reader "0.10.0"]
-
-                    [org.clojure/tools.logging "0.3.1"]
-                    [org.slf4j/jcl-over-slf4j "1.7.13"]
-                    [org.slf4j/jul-to-slf4j "1.7.13"]
-                    [org.slf4j/log4j-over-slf4j "1.7.13"]
-                    [ch.qos.logback/logback-classic "1.1.3" :exclusions [org.slf4j/slf4j-api]]])
+                    [org.clojure/tools.cli "0.3.3"]
+                    [prismatic/schema "1.0.5"]
+                    [com.taoensso/timbre "4.3.1"]
+                    [mount "0.1.10"]
+                    [robert/hooke "1.3.0"]
+                    [cprop "0.1.7"]])
+<% if any frontend %>
 
 (def frontend-dev-deps '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
                          [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
@@ -40,18 +30,20 @@
                          [weasel "0.7.0" :scope "test"]
                          [org.clojure/tools.nrepl "0.2.12" :scope "test"]])
 
+;; All the deps are "test" because they are only need for compiling to
+;; JavaScript, not "real" project dependencies.
 (def frontend-deps '[[org.clojure/clojure "1.8.0" :scope "test"]
                      [org.clojure/clojurescript "1.8.51" :scope "test"]
                      [org.clojure/core.async "0.2.374" :scope "test"]
-                     [reagent "0.5.1" :exclusions [org.clojure/tools.reader]]
-                     [reagent-forms "0.5.23"]
-                     [reagent-utils "0.1.8"]
-                     [hiccup "1.0.5"]
-                     [secretary "1.2.3"]
-                     [venantius/accountant "0.1.7"]
+                     [reagent "0.5.1" :exclusions [org.clojure/tools.reader] :scope "test"]
+                     [reagent-forms "0.5.23" :scope "test"]
+                     [reagent-utils "0.1.8" :scope "test"]
+                     [hiccup "1.0.5" :scope "test"]
+                     [secretary "1.2.3" :scope "test"]
+                     [venantius/accountant "0.1.7" :scope "test"]
                      [com.cognitect/transit-cljs "0.8.237" :scope "test"]
-                     [adzerk/cljs-console "0.1.1"]])
-
+                     [adzerk/cljs-console "0.1.1" :scope "test"]])
+<% endif %>
 (set-env! :source-paths #{"dev"}
           :dependencies common-deps)
 
@@ -60,7 +52,8 @@
          '[clojure.string :as string]
          '[boot.pod :as pod]
          '[boot.util :as util]
-         '[boot-semver.core :refer [get-version]])
+         '[boot-semver.core :refer [get-version]]
+         '[adzerk.env :refer [env]])
 
 (def +version+ (get-version))
 
@@ -69,6 +62,13 @@
                     :url "http://example.com/FIXME"
                     :description "FIXME: write description"
                     :license {}})
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;;;  Env Variables  ;;;
+;;;;;;;;;;;;;;;;;;;;;;;
+
+(env/def
+  BOOT_BUILD_FLAVOR nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;  BACKEND OPTIONS  ;;
@@ -87,7 +87,7 @@
          {:props {"CLJS_LOG_LEVEL" "DEBUG"}
           :env {:dependencies (vec (concat backend-deps @@(resolve 'boot.repl/*default-dependencies*)))
                 :middleware @@(resolve 'boot.repl/*default-middleware*)
-                :source-paths #{"src/backend" "env/dev/src" "dev"}
+                :source-paths #{"src/backend" "env/dev/src"}
                 :resource-paths #{"env/dev/resources"}}}))
 
 (defmethod boot/options [:backend :prod]
@@ -97,6 +97,7 @@
           :env {:dependencies backend-deps
                 :source-paths #{"src/backend" "env/prod/src"}
                 :resource-paths #{"env/prod/resources"}}}))
+<% if any frontend %>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  FRONTEND OPTIONS  ;;
@@ -162,70 +163,53 @@
                     :compiler-options dev-compiler-options})
       (update-in [:env :source-paths] conj "test/frontend")))
 
+<% endif %>
 ;;;;;;;;;;;;;;;;;;
 ;;  MAIN TASKS  ;;
 ;;;;;;;;;;;;;;;;;;
 
-(declare build-backend build-frontend)
-
 (deftask build
-  "Build the final artifact, if no type is passed in, it builds production."
-  []
-  (boot.util/warn "This is task is not implemented at the moment, try either build-frontend or build-backend.\n")
-  identity)
+  "Build the final artifact.
+
+   In order to allow task chaining (\"boot build deploy\" at the cmd line for
+   instance), building all flavors at the same time is not supported at the
+   moment. This means that the build task requires a --flavor and if missing it
+   will read it from BOOT_BUILD_FLAVOR.
+
+   Optionally you can specify a build type (dev or prod are supported out of
+   the box). If no type is passed in, prod will be build.
+
+   The option --o|--out-folder will keep the main.out folder in the fileset,
+   which is otherwise removed."
+  [f flavor VAL kw   "The flavor."
+   t type   VAL kw   "The build type, either prod or dev"
+   o out-folder bool "Include main.out folder."]
+  (let [type (or type :prod)
+        options (boot/options [flavor type])]
+    (util/info "Will build the backend %s profile...\n" type)
+    (case (or flavor (get (env/env) "BOOT_BUILD_FLAVOR"))
+      <% if any backend %>:backend (boot/build-backend options)<% endif %><% if any frontend %>
+      :frontend (boot/build-frontend options out-folder)<% endif %>
+      (throw (ex-info "Cannot build without a flavor. Either specify it with -f/--flavor or set BOOT_BUILD_FLAVOR" {:flavor flavor :type type})))))
 
 (declare dev-backend dev-frontend)
 
 (deftask dev
   "Start the development interactive environment."
-  []
+  [f flavor VAL kw "The flavor."]
   (boot.util/info "Starting interactive dev...\n")
-  (case (get-env :flavor)
-    "frontend" (dev-frontend)
-    "backend" (dev-backend)
+  (case flavor
+    <% if any backend %>:backend (dev-backend)<% endif %>
+    <% if any frontend %>:frontend (dev-frontend)<% endif %><% if all backend frontend %>
     (comp (dev-backend)
           (dev-frontend))))
+    <% endif %><% if any backend %>(dev-backend)))<% endif %>
 
 ;;;;;;;;;;;;;;;;;;;
 ;;  BUILD TASKS  ;;
 ;;;;;;;;;;;;;;;;;;;
 
-(deftask build-backend
-  "Build the final artifact, if no type is passed in, it builds production.
-
-   The artifact is the result of (comp (aot) (uber) (jar)) but no target is
-   appended."
-  [t type VAL kw "The build type, either prod or dev"]
-  (let [type (or type :prod)
-        options (boot/options [:backend type])]
-    (boot/apply-options! options)
-
-    (comp (with-pass-thru _
-            (util/info "Building backend %s profile...\n" type)
-            (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
-          (apply aot (flatten (seq (:aot options))))
-          (apply uber (flatten (seq (:uber options))))
-          (apply jar (flatten (seq (:jar options)))))))
-
-(deftask build-frontend
-  "Build the final artifact.
-
-  If no type is passed in, it builds production. The folder <project>.out is
-  excluded by default unless :include-out (-o) is specified."
-  [t type VAL kw   "The build type, either prod or dev"
-   o out      bool "Include <project>.out folder."]
-  (let [type (or type :prod)
-        options (boot/options [:frontend type])]
-    (boot/apply-options! options)
-    (require 'adzerk.boot-cljs)
-    (let [cljs (resolve 'adzerk.boot-cljs/cljs)]
-      (comp (with-pass-thru _
-              (boot.util/info "Building frontend %s profile...\n" type)
-              (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
-            (apply cljs (flatten (seq (:cljs options))))
-            (if-not out
-              (sift :include #{#"<<name>>.out"} :invert true)
-              identity)))))
+;; see dev/boot.clj for customizations
 
 ;;;;;;;;;;;;;;;;;
 ;;  DEV TASKS  ;;

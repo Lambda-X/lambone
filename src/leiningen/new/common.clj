@@ -18,11 +18,6 @@
    options
    {:tag-open \< :tag-close \> :filter-open \< :filter-close \>}))
 
-(defn slurp-resource [path]
-  (-> (str "leiningen/new/luminus/" path)
-      clojure.java.io/resource
-      slurp))
-
 (defn render-asset [render options asset]
   (if (string? asset)
     asset
@@ -55,24 +50,6 @@
              (map str)
              (clojure.string/join (str "\n" indents)))))))
 
-(defn unwrap-map [text]
-  (let [sb (StringBuilder. text)]
-    (.setCharAt sb (.indexOf text "{") \space)
-    (.setCharAt sb (.lastIndexOf text "}") \space)
-    (.toString sb)))
-
-(defn append-options [options k v]
-  (update-in options [k] (fnil into []) v))
-
-(defn append-formatted [options k v indent-width]
-  (assoc options k (indent indent-width v)))
-
-(defn remove-conflicting-assets [assets filter-str]
-  (remove #(and (coll? %)
-                (and (string? (second %))
-                     (.endsWith (second %) filter-str)))
-          assets))
-
 (defn unsupported-jetty-java-version? [java-version]
   (as-> java-version %
     (clojure.string/split % #"\.")
@@ -80,3 +57,9 @@
     (map #(Integer/parseInt %) %)
     (and (< (first %) 2)
          (< (second %) 8))))
+
+(defn feature->keyword
+  "Drops the first char (typically a +) and creates a keyword from the
+  rest of feature string."
+  [feature]
+  (keyword (rest feature)))

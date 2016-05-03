@@ -10,4 +10,4 @@
 (enable-console-print!)
 
 (defn init []
-  (log/info "Welcome to test-seven!"))
+  (log/info "Welcome to <<name>>!"))
