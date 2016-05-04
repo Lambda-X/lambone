@@ -64,10 +64,6 @@
       (main/info "Project name is missing.\nTry: lein new lambone PROJECT_NAME"
                  name (clojure.string/join " " (:features options)))
 
-      feature-params
-      (main/info "Unrecognized options:" (format-features feature-params)
-                 "\nThis template does not accept options at the moment.")
-
       unsupported
       (main/info "Unrecognized options:" (format-features unsupported)
                  "\nSupported options are:" (format-features supported-features))

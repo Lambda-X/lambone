@@ -6,28 +6,42 @@
             [clojure.repl :refer [apropos dir doc find-doc pst source]]
             [clojure.tools.namespace.repl :refer [refresh refresh-all]]
             [clojure.java.io :as io]
-            [com.stuartsierra.component :as component]
-            [clojure.core.async :as a :refer [>! <! >!! <!! chan buffer dropping-buffer sliding-buffer close! timeout alts! alts!! go-loop]]
-            [<<project-ns>>.system :as system]
-            [reloaded.repl :refer [system init start stop go reset reset-all]]
+            [mount.core :as mount :refer [start-without start-with start-with-states stop-except
+                                          only except swap swap-states with-args]]
+            [mount.tools.graph :as mount-graph]
             [schema.core :as schema]
             [taoensso.timbre :as timbre :refer [log trace debug info warn error fatal report
                                                 logf tracef debugf infof warnf errorf fatalf reportf
                                                 spy get-env log-env]]
-            [taoensso.timbre.profiling :as profiling :refer [pspy pspy* profile defnp p p*]]))
+            [taoensso.timbre.profiling :as profiling :refer [pspy pspy* profile defnp p p*]]
+            [<<name>>.core :as core]
+            [<<name>>.system :as system]))
 
-(defn new-dev-system
-  "Create a development system"
+(defn config
+  "Pretty print the system status"
   []
-  (component/system-using
-   (system/new-system-map (system/make-config))
-   (system/new-dependency-map)))
+  (pprint system/config))
 
-(reloaded.repl/set-init! new-dev-system)
+(defn status
+  "Pretty print the system status"
+  []
+  (pprint (mount-graph/states-with-deps)))
+
+(def start core/start)
+
+(def stop core/stop)
+
+(defn go []
+  (mount/start)
+  :ready)
+
+(defn reset []
+  (mount/stop)
+  (refresh :after 'dev/go))
 
 (defn check
   "Check for component validation errors"
-  []
+  [system]
   (let [errors
         (->> system
              (reduce-kv
@@ -35,11 +49,10 @@
                 (assoc acc k (schema/check (type v) v)))
               {})
              (filter (comp some? second)))]
-
     (when (seq errors) (into {} errors))))
 
 (defn test-all []
-  (run-all-tests #"<<project-ns>>.*test$"))
+  (run-all-tests #"<<name>>.*test$"))
 
 (defn reset-and-test []
   (reset)

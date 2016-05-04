@@ -1,4 +1,4 @@
-(ns <<project-ns>>.app
+(ns <<name>>.app
   (:require [cognitect.transit :as t]
             [goog.dom :as gdom]
             [reagent.core :as reagent :refer [atom]]
@@ -10,4 +10,4 @@
 (enable-console-print!)
 
 (defn init []
-  (log/info "Welcome to <<name>>!"))
+  (log/info "Welcome to <<name|title>>!"))

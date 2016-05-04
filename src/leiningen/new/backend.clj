@@ -15,15 +15,16 @@
    ["env/test/resources/config.edn" "common/env/test/resources/config.edn"]
 
    ;; config namespaces
+   ["dev/boot.clj" "common/dev/boot.clj"]
+   ["env/dev/src/user.clj" "common/env/dev/src/user.clj"]
+   ["env/dev/src/dev.clj" "common/env/dev/src/dev.clj"]
    ["env/dev/src/{{sanitized}}/env.cljc" "common/env/dev/src/env.cljc"]
    ["env/prod/src/{{sanitized}}/env.cljc" "common/env/prod/src/env.cljc"]
+   ["env/test/src/{{sanitized}}/env.cljc" "common/env/test/src/env.cljc"]
 
-   ;; core namespaces
-   ["dev/dev.clj" "common/dev/dev.clj"]
-   ["dev/user.clj" "common/dev/user.clj"]
-   ["dev/boot.clj" "common/dev/boot.clj"]
-   ["src/backend/{{sanitized}}/main.clj" "common/src/backend/main.clj"]
+   ["src/backend/{{sanitized}}/core.clj" "common/src/backend/core.clj"]
    ["src/backend/{{sanitized}}/system.clj" "common/src/backend/system.clj"]
+   ["src/backend/{{sanitized}}/logging.clj" "common/src/backend/logging.clj"]
 
    ;; tests
    ["test/backend/{{sanitized}}/test/system.clj" "common/test/backend/test/system.clj"]

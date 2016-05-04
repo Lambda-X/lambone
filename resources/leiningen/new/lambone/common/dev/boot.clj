@@ -1,15 +1,19 @@
 (ns boot
-  (:require [boot.util :as util]
-            [boot.core :as boot]))
+  (:require [clojure.string :as string]
+            [clojure.pprint :refer [pprint]]
+            [boot.core :refer :all]
+            [boot.util :as util]
+            [boot.pod :as pod]
+            [boot.task.built-in :as built-in]))
 
-(boot/deftask version-file
+(deftask version-file
   "A task that includes the version.properties file in the fileset."
   []
-  (boot/with-pre-wrap [fileset]
+  (with-pre-wrap [fileset]
     (util/info "Add version.properties...\n")
     (-> fileset
-        (boot/add-resource (java.io.File. ".") :include #{#"^version\.properties$"})
-        boot/commit!)))
+        (add-resource (java.io.File. ".") :include #{#"^version\.properties$"})
+        commit!)))
 
 (defn set-system-properties!
   "Set a system property for each entry in the map m."
@@ -28,7 +32,7 @@
   [options]
   (let [env (:env options)
         props (:props options)]
-    (apply boot/set-env! (reduce #(into %2 %1) [] env))
+    (apply set-env! (reduce #(into %2 %1) [] env))
     (assert (or (nil? props) (map? props)) "Option :props should be a map.")
     (set-system-properties! props)))
 
@@ -40,24 +44,130 @@
           #{}
           [:source-paths :resource-paths :asset-paths]))
 
-(defn test-cljs-opts
+(defn build-backend
+  "Return a boot task for building the backend.
+
+   The artifact is the result of (comp (aot) (uber) (jar)) but no target is
+   appended."
+  [options]
+  (apply-options! options)
+  (let [jar-name (get-in options [:jar :file])]
+    (comp (with-pass-thru _
+            (util/info "Generating %s...\n" jar-name))
+          (if (> @boot.util/*verbosity* 2)
+            (built-in/show :deps true)
+            identity)
+          (apply built-in/aot (flatten (seq (:aot options))))
+          (apply built-in/uber (flatten (seq (:uber options))))
+          (apply built-in/jar (flatten (seq (:jar options))))
+          (built-in/sift :include #{(re-pattern jar-name)}))))
+
+(defn build-frontend
+  "Return a boot task for building the frontend.
+
+  The folder main.out is excluded by default unless out-folder? is
+  specified."
+  [options out-folder?]
+  (apply-options! options)
+  (require 'adzerk.boot-cljs)
+  (let [cljs (resolve 'adzerk.boot-cljs/cljs)]
+    (comp (with-pass-thru _
+            (boot.util/info "Building frontend %s profile...\n" type)
+            (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
+          (apply cljs (flatten (seq (:cljs options))))
+          (if-not out-folder?
+            (built-in/sift :include #{#"main.out"} :invert true)
+            identity))))
+
+(defn dev-backend
+  "Start the development interactive environment.
+
+   Repl in a pod, inspired by https://github.com/juxt/edge"
+  [options]
+  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+  (let [env (:env options)
+        pod-env (assoc env :directories (boot/env->directories env))
+        pod (future (pod/make-pod pod-env))
+        {:keys [port init-ns]} (:repl options)]
+    (with-pass-thru _
+      (util/info "Launching backend nRepl...\n")
+      (pod/with-eval-in @pod
+        (require '[boot.pod :as pod])
+        (require '[boot.util :as util])
+        (require '[boot.repl :as repl])
+        (require '[clojure.tools.namespace.repl :as tnsr])
+
+        (apply tnsr/set-refresh-dirs (-> pod/env :directories))
+        (repl/launch-nrepl {:init-ns '~init-ns
+                            :port '~port
+                            :server true
+                            :middleware (:middleware pod/env)})
+        ;; Auto-start the system
+        (require 'dev)
+        (dev/go)))))
+
+(defn dev-frontend
+  "Start the development interactive environment."
+  [options]
+  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+  (apply-options! options)
+  (require 'adzerk.boot-cljs
+           'adzerk.boot-cljs-repl
+           'adzerk.boot-reload
+           'mathias.boot-sassc
+           'pandeiro.boot-http)
+  (let [reload (resolve 'adzerk.boot-reload/reload)
+        cljs-repl (resolve 'adzerk.boot-cljs-repl/cljs-repl)
+        cljs (resolve 'adzerk.boot-cljs/cljs)
+        cljs-build-deps (resolve 'adzerk.boot-cljs/deps)
+        serve (resolve 'pandeiro.boot-http/serve)
+        sass (resolve 'mathias.boot-sassc/sass)]
+    (comp (serve :dir "target")
+          (built-in/watch)
+          (apply sass (flatten (seq (:sass options))))
+          (apply reload (flatten (seq (:reload options))))
+          (apply cljs-repl (flatten (seq (:cljs-repl options))))
+          (apply cljs (flatten (seq (:cljs options))))
+          (if (> @boot.util/*verbosity* 1)
+            (built-in/show :fileset true)
+            identity)
+          (built-in/target :dir #{"target"}))))
+
+(defn boot-test-opts
+  [options namespaces exclusions]
+  (cond-> (boot/options [:backend :test])
+    namespaces (assoc-in [:test :namespaces] namespaces)
+    exclusions (assoc-in [:test :exclusions] exclusions)))
+
+(defn test-backend
+  "Run tests once for the backend (uses clojure.test)."
+  [options]
+  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+  (apply-options! options)
+  (require 'adzerk.boot-test)
+  (let [test (resolve 'adzerk.boot-test/test)]
+    (comp (with-pass-thru _
+            (util/info "Testing the backend, prepend with watch for auto testing...\n"))
+          (apply test (flatten (seq (:test options)))))))
+
+(defn boot-cljs-test-opts
   [options namespaces exit?]
   (cond-> options
     namespaces (-> (update-in [:test-cljs :suite-ns] (fn [_] nil))
                    (assoc-in [:test-cljs :namespaces] namespaces))
     exit? (assoc-in [:test-cljs :exit?] exit?)))
 
-(defn build-backend
-  "Build the final artifact, if no type is passed in, it builds production.
+(defn test-frontend
+  "Run tests once.
 
-   The artifact is the result of (comp (aot) (uber) (jar)) but no target is
-   appended."
-  [options type]
-  (let [type (or type :prod)]
-    (boot/apply-options! options)
-    (comp (boot/with-pass-thru _
-            (util/info "Building backend %s profile...\n" type)
-            (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
-          (apply boot/aot (flatten (seq (:aot options))))
-          (apply boot/uber (flatten (seq (:uber options))))
-          (apply boot/jar (flatten (seq (:jar options)))))))
+  If no type is passed in, it tests against the production build. It
+  optionally accepts (a set of) symbols that are used for testing only
+  some namespaces."
+  [options]
+  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+  (apply-options! options)
+  (require 'crisptrutski.boot-cljs-test)
+  (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)]
+    (comp (with-pass-thru _
+            (util/info "Testing the frontend, prepend with watch for auto testing...\n"))
+          (apply test-cljs (flatten (seq (:test-cljs options)))))))

@@ -1,10 +1,10 @@
-(ns <<project-ns>>.system
+(ns <<name>>.system
   "The system, aka the core of your app"
-  (:require [com.stuartsierra.component :as component]
-            [cprop.core :refer [load-config]]
+  (:require [mount.core :as mount]
+            [cprop.core :as c]
             [clojure.java.io :as io]
             [clojure.string :as str]
-            [<<project-ns>>.env :as env])
+            [<<name>>.env :as env])
   (:import java.util.Properties))
 
 (defn version!
@@ -21,22 +21,17 @@
         (println "Handled exception -" (.getMessage ex))))
     (.getProperty props "VERSION")))
 
+(defn greeting
+  "Return the greeting (as string)"
+  [config]
+  (str (:greeting config) (when (:version config) (str " - " (:version config)))))
+
 (defn make-config
   "Creates a default configuration map"
   []
-  (-> (load-config :merge [env/defaults
-                           {:version (if-let [version (version!)] version "0.0.0")}])))
+  (-> (c/load-config :merge [env/defaults
+                             {:version (if-let [version (version!)] version "0.0.0")}])))
 
-(defn new-system-map [config]
-  (component/system-map
-   ;; put here your components
-   ))
-
-(defn new-dependency-map []
-  {})
-
-(defn new-production-system
-  "Create the production system"
-  []
-  (-> (new-system-map)
-      (component/system-using (new-dependency-map))))
+(mount/defstate
+  config
+  :start (make-config))
