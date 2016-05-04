@@ -1,6 +1,7 @@
 (ns leiningen.new.lambone
   {:from 'luminus-framework/luminus-template}
   (:require [clojure.set :as set]
+            [clojure.string :as s]
             [clojure.pprint :refer [pprint]]
             [clojure.java.io :as io]
             [leiningen.new.templates :refer [renderer name-to-path sanitize sanitize-ns]]
@@ -18,7 +19,7 @@
         [assets options] (-> [[] options]
                              (backend/features)
                              (frontend/features))]
-    (main/info "Generating with options\n" (with-out-str (pprint options)))
+    (main/info "Generating with options\n" (s/trim-newline (with-out-str (pprint options))))
     (common/render-assets (renderer "lambone" common/render-template)
                           assets
                           options)))
@@ -71,4 +72,5 @@
       (.exists (io/file name))
       (main/info "Could not create project because a directory named" name "already exists!")
 
-      :else (render-project options (set/union default-features user-features)))))
+      :else (do (render-project options (set/union default-features user-features))
+                (main/info "Done!")))))

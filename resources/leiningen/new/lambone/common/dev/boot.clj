@@ -43,7 +43,7 @@
   (reduce #(into %1 (get env %2))
           #{}
           [:source-paths :resource-paths :asset-paths]))
-
+<% if any backend %>
 (defn build-backend
   "Return a boot task for building the backend.
 
@@ -61,23 +61,6 @@
           (apply built-in/uber (flatten (seq (:uber options))))
           (apply built-in/jar (flatten (seq (:jar options))))
           (built-in/sift :include #{(re-pattern jar-name)}))))
-
-(defn build-frontend
-  "Return a boot task for building the frontend.
-
-  The folder main.out is excluded by default unless out-folder? is
-  specified."
-  [options out-folder?]
-  (apply-options! options)
-  (require 'adzerk.boot-cljs)
-  (let [cljs (resolve 'adzerk.boot-cljs/cljs)]
-    (comp (with-pass-thru _
-            (boot.util/info "Building frontend %s profile...\n" type)
-            (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
-          (apply cljs (flatten (seq (:cljs options))))
-          (if-not out-folder?
-            (built-in/sift :include #{#"main.out"} :invert true)
-            identity))))
 
 (defn dev-backend
   "Start the development interactive environment.
@@ -106,6 +89,41 @@
         (require 'dev)
         (dev/go)))))
 
+(defn boot-test-opts
+  [options namespaces exclusions]
+  (cond-> (boot/options [:backend :test])
+    namespaces (assoc-in [:test :namespaces] namespaces)
+    exclusions (assoc-in [:test :exclusions] exclusions)))
+
+(defn test-backend
+  "Run tests once for the backend (uses clojure.test)."
+  [options]
+  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+  (apply-options! options)
+  (require 'adzerk.boot-test)
+  (let [test (resolve 'adzerk.boot-test/test)]
+    (comp (with-pass-thru _
+            (util/info "Testing the backend, prepend with watch for auto testing...\n"))
+          (apply test (flatten (seq (:test options)))))))
+<% endif %><% if any frontend %>
+(defn build-frontend
+  "Return a boot task for building the frontend.
+
+  The folder main.out is excluded by default unless out-folder? is
+  specified."
+  [options out-folder?]
+  (apply-options! options)
+  (require 'adzerk.boot-cljs)
+  (let [cljs (resolve 'adzerk.boot-cljs/cljs)]
+    (comp (with-pass-thru _
+            (boot.util/info "Building frontend %s profile...\n" type)
+            (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
+          (apply sass (flatten (seq (:sass options))))
+          (apply cljs (flatten (seq (:cljs options))))
+          (if-not out-folder?
+            (built-in/sift :include #{#"main.out"} :invert true)
+            identity))))
+
 (defn dev-frontend
   "Start the development interactive environment."
   [options]
@@ -133,23 +151,6 @@
             identity)
           (built-in/target :dir #{"target"}))))
 
-(defn boot-test-opts
-  [options namespaces exclusions]
-  (cond-> (boot/options [:backend :test])
-    namespaces (assoc-in [:test :namespaces] namespaces)
-    exclusions (assoc-in [:test :exclusions] exclusions)))
-
-(defn test-backend
-  "Run tests once for the backend (uses clojure.test)."
-  [options]
-  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
-  (apply-options! options)
-  (require 'adzerk.boot-test)
-  (let [test (resolve 'adzerk.boot-test/test)]
-    (comp (with-pass-thru _
-            (util/info "Testing the backend, prepend with watch for auto testing...\n"))
-          (apply test (flatten (seq (:test options)))))))
-
 (defn boot-cljs-test-opts
   [options namespaces exit?]
   (cond-> options
@@ -171,3 +172,4 @@
     (comp (with-pass-thru _
             (util/info "Testing the frontend, prepend with watch for auto testing...\n"))
           (apply test-cljs (flatten (seq (:test-cljs options)))))))
+<% endif %>

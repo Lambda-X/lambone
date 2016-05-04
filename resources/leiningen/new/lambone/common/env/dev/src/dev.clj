@@ -27,9 +27,9 @@
   []
   (pprint (mount-graph/states-with-deps)))
 
-(def start core/start)
+(def start mount/start)
 
-(def stop core/stop)
+(def stop mount/stop)
 
 (defn go []
   (mount/start)

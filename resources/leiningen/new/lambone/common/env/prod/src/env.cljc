@@ -4,7 +4,7 @@
 
 (def ^{:doc "The default clj/cljs environment"}
   defaults
-  {:greeting "Project <<project-ns>>"
+  {:greeting "Project <<name|title>>"
    ;; Log configuration:
    ;; for clj, see https://github.com/ptaoussanis/timbre#configuration
    ;; for cljs, see https://github.com/adzerk-oss/cljs-console

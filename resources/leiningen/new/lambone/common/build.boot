@@ -3,7 +3,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;
 
 (def common-deps '[[degree9/boot-semver "1.2.4" :scope "test"]
-                   [adzerk/env "0.3.0" :scope "test"]])
+                   [adzerk/env "0.3.0" :scope "test"]
+                   [pandeiro/boot-http "0.7.3" :scope "test"]])
 
 (def backend-dev-deps '[[adzerk/boot-test "1.1.1"]])
 
@@ -17,13 +18,11 @@
                     [robert/hooke "1.3.0"]
                     [cprop "0.1.7"]])
 <% if any frontend %>
-
 (def frontend-dev-deps '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
                          [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
                          [adzerk/boot-reload "0.4.4" :scope "test"]
                          [deraen/boot-less "0.5.0" :scope "test"]
                          [mathias/boot-sassc "0.1.5" :scope "test"]
-                         [pandeiro/boot-http "0.7.3" :scope "test"]
                          [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
                          [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
                          [com.cemerick/piggieback "0.2.1" :scope "test"]
@@ -53,6 +52,7 @@
          '[boot.pod :as pod]
          '[boot.util :as util]
          '[boot-semver.core :refer [get-version]]
+         '[pandeiro.boot-http :refer [serve]]
          '[adzerk.env :as env])
 
 (def +version+ (get-version))
@@ -68,7 +68,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (env/def
-  BOOT_BUILD_FLAVOR <% if all backend frontend%>:required<% endif%><% if any backend %>"backend"<% endif%>)
+  BOOT_BUILD_FLAVOR <% if all backend frontend%>nil<% endif%><% if any backend %>"backend"<% endif%>)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;  BACKEND OPTIONS  ;;
