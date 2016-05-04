@@ -1,12 +1,24 @@
 # lambone
 
-A Leiningen template for FIXME.
+A template for bare backend + frontend projects.
 
 ## Usage
 
-Very simply:
+Very simply, for backend-only project:
 
-` lein new lambone <you-app-name>`
+`lein new lambone <you-app-name>`
+
+Or:
+
+`lein new lambone <you-app-name> +frontend`
+
+For `boot-new` users
+
+`boot -d seancorfield/boot-new new -t lambone -n test-arsarsars`
+
+Or:
+
+`boot -d seancorfield/boot-new new -t lambone -n test-arsarsars -a +frontend`
 
 ## License
 
