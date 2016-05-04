@@ -6,8 +6,8 @@
             [clojure.repl :refer [apropos dir doc find-doc pst source]]
             [clojure.tools.namespace.repl :refer [refresh refresh-all]]
             [clojure.java.io :as io]
-            [mount.core :as mount :refer [start-without start-with start-with-states stop-except
-                                          only except swap swap-states with-args]]
+            [mount.core :as mount :refer [start stop start-without start-with start-with-states
+                                          stop-except only except swap swap-states with-args]]
             [mount.tools.graph :as mount-graph]
             [schema.core :as schema]
             [taoensso.timbre :as timbre :refer [log trace debug info warn error fatal report
@@ -27,10 +27,6 @@
   []
   (pprint (mount-graph/states-with-deps)))
 
-(def start mount/start)
-
-(def stop mount/stop)
-
 (defn go []
   (mount/start)
   :ready)
@@ -38,18 +34,6 @@
 (defn reset []
   (mount/stop)
   (refresh :after 'dev/go))
-
-(defn check
-  "Check for component validation errors"
-  [system]
-  (let [errors
-        (->> system
-             (reduce-kv
-              (fn [acc k v]
-                (assoc acc k (schema/check (type v) v)))
-              {})
-             (filter (comp some? second)))]
-    (when (seq errors) (into {} errors))))
 
 (defn test-all []
   (run-all-tests #"<<name>>.*test$"))
