@@ -64,8 +64,11 @@
                     :license {}})
 
 ;;;;;;;;;;;;;;;;;;;;;;;
-;;;  Env Variables  ;;;
+;;;   Environment   ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Note that these are treated as system properties, see https://github.com/adzerk-oss/env/issues/2
+;; and adopt the syntax for cprop: https://github.com/tolitius/cprop#system-properties-cprop-syntax
 
 (env/def
   BOOT_BUILD_FLAVOR <% if all backend frontend%>nil<% endif%><% if any backend %>"backend"<% endif%>)

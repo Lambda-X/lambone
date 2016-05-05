@@ -19,3 +19,4 @@ out/
 figwheel_server.log
 pom.xml
 pom.xml.asc
+profile.boot
