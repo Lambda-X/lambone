@@ -72,5 +72,4 @@
       (.exists (io/file name))
       (main/info "Could not create project because a directory named" name "already exists!")
 
-      :else (do (render-project options (set/union default-features user-features))
-                (main/info "Done!")))))
+      :else (do (render-project options (set/union default-features user-features))))))
