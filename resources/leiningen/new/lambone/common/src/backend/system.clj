@@ -13,8 +13,8 @@
   (let [props (Properties.)]
     (try
       ;; side effect
-      (some->> "version.properties"
-               io/resource
+      (some->> (or (io/resource "version.properties")
+                   (io/file "version.properties"))
                io/reader
                (.load props))
       (catch java.io.FileNotFoundException ex
