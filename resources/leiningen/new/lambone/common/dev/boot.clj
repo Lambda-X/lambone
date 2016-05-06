@@ -121,7 +121,8 @@
   [options out-folder?]
   (apply-options! options)
   (require 'adzerk.boot-cljs)
-  (let [cljs (resolve 'adzerk.boot-cljs/cljs)]
+  (let [cljs (resolve 'adzerk.boot-cljs/cljs)
+        sass (resolve 'mathias.boot-sassc/sass)]
     (comp (with-pass-thru _
             (boot.util/info "Building frontend %s profile...\n" type)
             (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
