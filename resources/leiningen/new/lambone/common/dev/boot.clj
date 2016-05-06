@@ -146,18 +146,15 @@
         cljs-repl (resolve 'adzerk.boot-cljs-repl/cljs-repl)
         cljs (resolve 'adzerk.boot-cljs/cljs)
         cljs-build-deps (resolve 'adzerk.boot-cljs/deps)
-        serve (resolve 'pandeiro.boot-http/serve)
         sass (resolve 'mathias.boot-sassc/sass)]
-    (comp (serve :dir "target")
-          (built-in/watch)
+    (comp (built-in/watch)
           (apply sass (flatten (seq (:sass options))))
           (apply reload (flatten (seq (:reload options))))
           (apply cljs-repl (flatten (seq (:cljs-repl options))))
           (apply cljs (flatten (seq (:cljs options))))
           (if (> @boot.util/*verbosity* 1)
             (built-in/show :fileset true)
-            identity)
-          (built-in/target :dir #{"target"}))))
+            identity))))
 
 (defn boot-cljs-test-opts
   [options namespaces exit?]
