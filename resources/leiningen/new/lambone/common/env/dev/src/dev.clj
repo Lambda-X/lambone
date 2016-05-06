@@ -1,21 +1,17 @@
 (ns dev
-  {:from :juxt/edge}
   (:require [clojure.pprint :refer [pprint]]
             [clojure.test :refer [run-all-tests]]
             [clojure.reflect :refer [reflect]]
             [clojure.repl :refer [apropos dir doc find-doc pst source]]
-            [clojure.tools.namespace.repl :refer [refresh refresh-all]]
+            [clojure.tools.namespace.repl :as tnr]
             [clojure.java.io :as io]
-            [mount.core :as mount :refer [start stop start-without start-with start-with-states
+            [mount.core :as mount :refer [start-without start-with start-with-states
                                           stop-except only except swap swap-states with-args]]
             [mount.tools.graph :as mount-graph]
-            [schema.core :as schema]
-            [taoensso.timbre :as timbre :refer [log trace debug info warn error fatal report
-                                                logf tracef debugf infof warnf errorf fatalf reportf
-                                                spy get-env log-env]]
-            [taoensso.timbre.profiling :as profiling :refer [pspy pspy* profile defnp p p*]]
-            [<<name>>.core :as core]
-            [<<name>>.system :as system]))
+            [clojure.tools.logging :as log :refer [spy spyf]]
+            [adzerk.env :refer [env]]
+            [<<project-ns>>.core :as core]
+            [<<project-ns>>.system :as system]))
 
 (defn config
   "Pretty print the system status"
@@ -27,13 +23,27 @@
   []
   (pprint (mount-graph/states-with-deps)))
 
+(def start #(core/start nil)) ;; no args to start
+
+(def stop core/stop)
+
 (defn go []
-  (mount/start)
+  (start)
   :ready)
 
 (defn reset []
-  (mount/stop)
-  (refresh :after 'dev/go))
+  (stop)
+  (tnr/refresh :after 'dev/go))
+
+(defn refresh
+  []
+  (stop)
+  (tnr/refresh))
+
+(defn refresh-all
+  []
+  (stop)
+  (tnr/refresh-all))
 
 (defn test-all []
   (run-all-tests #"<<name>>.*test$"))

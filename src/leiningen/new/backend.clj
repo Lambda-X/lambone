@@ -10,11 +10,12 @@
    ["README.md" "common/README.md"]
    ["LICENSE" "common/LICENSE"]
 
+   ["env/prod/resources/log4j2.xml" "common/env/prod/resources/log4j2.xml"]
+   ["env/dev/resources/log4j2.xml" "common/env/dev/resources/log4j2.xml"]
    ["env/prod/resources/config.edn" "common/env/prod/resources/config.edn"]
    ["env/dev/resources/config.edn" "common/env/dev/resources/config.edn"]
    ["env/test/resources/config.edn" "common/env/test/resources/config.edn"]
 
-   ;; config namespaces
    ["dev/boot.clj" "common/dev/boot.clj"]
    ["env/dev/src/user.clj" "common/env/dev/src/user.clj"]
    ["env/dev/src/dev.clj" "common/env/dev/src/dev.clj"]

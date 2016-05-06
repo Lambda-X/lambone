@@ -1,4 +1,4 @@
-(ns <<name>>.app
+(ns <<project-ns>>.app
   (:require [cognitect.transit :as t]
             [goog.dom :as gdom]
             [reagent.core :as reagent :refer [atom]]

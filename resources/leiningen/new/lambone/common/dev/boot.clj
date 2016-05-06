@@ -62,18 +62,25 @@
           (apply built-in/jar (flatten (seq (:jar options))))
           (built-in/sift :include #{(re-pattern jar-name)}))))
 
+(defn make-pod-env
+  [current-env]
+  (assoc current-env
+         :directories (boot/env->directories current-env)
+         :dependencies (concat (:dependencies current-env)
+                               @@(resolve 'boot.repl/*default-dependencies*))
+         :middleware @@(resolve 'boot.repl/*default-middleware*)))
+
 (defn dev-backend
   "Start the development interactive environment.
 
    Repl in a pod, inspired by https://github.com/juxt/edge"
   [options]
   (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
-  (let [env (:env options)
-        pod-env (assoc env :directories (boot/env->directories env))
+  (let [pod-env (make-pod-env (:env options))
         pod (future (pod/make-pod pod-env))
         {:keys [port init-ns]} (:repl options)]
+    (util/dbug "Pod env:\n%s\n" (with-out-str (pprint pod-env)))
     (with-pass-thru _
-      (util/info "Launching backend nRepl...\n")
       (pod/with-eval-in @pod
         (require '[boot.pod :as pod])
         (require '[boot.util :as util])

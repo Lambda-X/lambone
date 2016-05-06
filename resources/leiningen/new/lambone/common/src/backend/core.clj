@@ -1,10 +1,11 @@
-(ns <<name>>.core
+(ns <<project-ns>>.core
   "The main application namespace"
   (:require [mount.core :as mount]
-            [taoensso.timbre :as log]
+            [clojure.tools.logging :as log]
             [clojure.tools.cli :as cli]
-            [<<name>>.system :as system]
-            [<<name>>.logging :as logging])
+            [robert.hooke :as hooke]
+            [<<project-ns>>.system :as system]
+            [<<project-ns>>.logging :as logging])
   (:gen-class))
 
 (def cli-options
@@ -15,16 +16,37 @@
 (defn stop
   []
   (mount/stop)
-  (log/info "[Stopped]")
-  (shutdown-agents))
+  (logging/without-logging-status)
+  (log/info "<=< Stopped"))
 
 (defn start
   [args]
+  (logging/with-logging-status)
   (-> args
       (cli/parse-opts cli-options)
       mount/start-with-args)
-  (log/info "[Started]" (system/greeting system/config))
-  (.addShutdownHook (Runtime/getRuntime) (Thread. stop)))
+  (log/info ">=> Started" (system/greeting system/config)))
+
+(defn main-stop
+  "Hook for -main side-effects on stop.
+
+  For instance this function should call shutdown-agents, which is not
+  desirable when stopping the app at the repl."
+  [f & args]
+  (apply f args)
+  (shutdown-agents))
+
+(defn main-start
+  "Hook for -main side-effects on start.
+
+  For instance this function should set .addShutdownHook and perform
+  all the side effects that need to be avoided when working at the
+  repl."
+  [f & args]
+  (.addShutdownHook (Runtime/getRuntime) (Thread. stop))
+  (apply f args))
 
 (defn -main [& args]
+  (hooke/add-hook #'<<project-ns>>.core/stop #'<<project-ns>>.core/main-stop)
+  (hooke/add-hook #'<<project-ns>>.core/start #'<<project-ns>>.core/main-start)
   (start args))

@@ -6,14 +6,20 @@
                    [adzerk/env "0.3.0" :scope "test"]
                    [pandeiro/boot-http "0.7.3" :scope "test"]])
 
-(def backend-dev-deps '[[adzerk/boot-test "1.1.1"]])
+(def backend-dev-deps '[[adzerk/boot-test "1.1.1"]
+                        [adzerk/env "0.3.0" :scope "test"]])
 
 (def backend-deps '[[org.clojure/clojure "1.8.0"]
                     [org.clojure/tools.namespace "0.2.10"]
                     [org.clojure/tools.reader "0.10.0"]
                     [org.clojure/tools.cli "0.3.3"]
-                    [prismatic/schema "1.0.5"]
-                    [com.taoensso/timbre "4.3.1"]
+                    [org.clojure/tools.logging "0.3.1"]
+                    [org.apache.logging.log4j/log4j-api "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-core "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-jcl "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-jul "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-1.2-api "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-slf4j-impl "2.5" :scope "runtime"]
                     [mount "0.1.10"]
                     [robert/hooke "1.3.0"]
                     [cprop "0.1.7"]])
@@ -85,15 +91,12 @@
    :aot {:all true}})
 
 (def backend-dev-dependencies
-  (vec (concat backend-dev-deps
-               backend-deps
-               @@(resolve 'boot.repl/*default-dependencies*))))
+  (vec (distinct (concat backend-dev-deps backend-deps))))
 
 (defmethod boot/options [:backend :dev]
   [selection]
   (merge backend-options
          {:env {:dependencies backend-dev-dependencies
-                :middleware @@(resolve 'boot.repl/*default-middleware*)
                 :source-paths #{"src/backend" "env/dev/src"}
                 :resource-paths #{"env/dev/resources"}}}))
 
@@ -233,8 +236,8 @@
       :frontend (dev-frontend)<% endif %><% if all backend frontend %>
       (comp (dev-backend)
             (dev-frontend)))))<% endif %><% if not all backend frontend %>
-      (comp (dev-backend)
-            (wait)))))<% endif %>
+(comp (dev-backend)
+      (wait)))))<% endif %>
 
 (ns-unmap 'boot.user 'test)
 
@@ -265,7 +268,7 @@
       <% if any frontend %>:frontend (test-frontend)<% endif %><% if all backend frontend %>
       (comp (test-backend)
             (test-frontend)))))
-      <% endif %><% if not all backend frontend %>(test-backend))))<% endif %>
+<% endif %><% if not all backend frontend %>(test-backend))))<% endif %>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  see dev/boot.clj for task customization  ;;

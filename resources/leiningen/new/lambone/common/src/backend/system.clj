@@ -1,10 +1,10 @@
-(ns <<name>>.system
+(ns <<project-ns>>.system
   "The system, aka the core of your app"
   (:require [mount.core :as mount]
             [cprop.core :as c]
             [clojure.java.io :as io]
             [clojure.string :as str]
-            [<<name>>.env :as env])
+            [<<project-ns>>.env :as env])
   (:import java.util.Properties))
 
 (defn version!

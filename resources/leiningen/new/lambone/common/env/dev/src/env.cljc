@@ -1,11 +1,5 @@
-(ns <<project-ns>>.env
-  (:require
-   #?@(:clj [[taoensso.timbre :as timbre]])))
+(ns <<project-ns>>.env)
 
 (def ^{:doc "The default clj/cljs environment"}
   defaults
-  {:greeting "Project <<name|title>> (DEV)"
-   ;; Log configuration:
-   ;; for clj, see https://github.com/ptaoussanis/timbre#configuration
-   ;; for cljs, see https://github.com/adzerk-oss/cljs-console
-   :logging {:level :debug}})
+  {:greeting "Project <<name|title>> (DEV)"})
