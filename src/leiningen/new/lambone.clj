@@ -69,7 +69,6 @@
       (main/info "Unrecognized options:" (format-features unsupported)
                  "\nSupported options are:" (format-features supported-features))
 
-      (.exists (io/file name))
-      (main/info "Could not create project because a directory named" name "already exists!")
-
-      :else (do (render-project options (set/union default-features user-features))))))
+      :else (do (when (.exists (io/file name))
+                  (main/warn "Overriding the directory named" name))
+                (render-project options (set/union default-features user-features))))))
