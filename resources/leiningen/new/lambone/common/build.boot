@@ -2,27 +2,29 @@
 ;;;  Dependencies  ;;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-(def common-deps '[[degree9/boot-semver "1.2.4" :scope "test"]
-                   [adzerk/env "0.3.0" :scope "test"]
-                   [pandeiro/boot-http "0.7.3" :scope "test"]])
+(def cmd-line-deps '[[degree9/boot-semver "1.2.4" :scope "test"]
+                     [adzerk/env "0.3.0" :scope "test"]
+                     [pandeiro/boot-http "0.7.3" :scope "test"]])
+
+(def common-deps '[[org.clojure/clojure "1.8.0" :scope "test"]])
 
 (def backend-dev-deps '[[adzerk/boot-test "1.1.1"]
                         [adzerk/env "0.3.0" :scope "test"]])
 
-(def backend-deps '[[org.clojure/clojure "1.8.0"]
-                    [org.clojure/tools.namespace "0.2.10"]
-                    [org.clojure/tools.reader "0.10.0"]
-                    [org.clojure/tools.cli "0.3.3"]
-                    [org.clojure/tools.logging "0.3.1"]
-                    [org.apache.logging.log4j/log4j-api "2.5" :scope "runtime"]
-                    [org.apache.logging.log4j/log4j-core "2.5" :scope "runtime"]
-                    [org.apache.logging.log4j/log4j-jcl "2.5" :scope "runtime"]
-                    [org.apache.logging.log4j/log4j-jul "2.5" :scope "runtime"]
-                    [org.apache.logging.log4j/log4j-1.2-api "2.5" :scope "runtime"]
-                    [org.apache.logging.log4j/log4j-slf4j-impl "2.5" :scope "runtime"]
-                    [mount "0.1.10"]
-                    [robert/hooke "1.3.0"]
-                    [cprop "0.1.7"]])
+(def backend-deps (into common-deps
+                        '[[org.clojure/tools.namespace "0.2.10"]
+                          [org.clojure/tools.reader "0.10.0"]
+                          [org.clojure/tools.cli "0.3.3"]
+                          [org.clojure/tools.logging "0.3.1"]
+                          [org.apache.logging.log4j/log4j-api "2.5" :scope "runtime"]
+                          [org.apache.logging.log4j/log4j-core "2.5" :scope "runtime"]
+                          [org.apache.logging.log4j/log4j-jcl "2.5" :scope "runtime"]
+                          [org.apache.logging.log4j/log4j-jul "2.5" :scope "runtime"]
+                          [org.apache.logging.log4j/log4j-1.2-api "2.5" :scope "runtime"]
+                          [org.apache.logging.log4j/log4j-slf4j-impl "2.5" :scope "runtime"]
+                          [mount "0.1.10"]
+                          [robert/hooke "1.3.0"]
+                          [cprop "0.1.7"]]))
 <% if any frontend %>
 (def frontend-dev-deps '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
                          [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
@@ -37,20 +39,20 @@
 
 ;; All the deps are "test" because they are only need for compiling to
 ;; JavaScript, not "real" project dependencies.
-(def frontend-deps '[[org.clojure/clojure "1.8.0" :scope "test"]
-                     [org.clojure/clojurescript "1.8.51" :scope "test"]
-                     [org.clojure/core.async "0.2.374" :scope "test"]
-                     [reagent "0.5.1" :exclusions [org.clojure/tools.reader] :scope "test"]
-                     [reagent-forms "0.5.23" :scope "test"]
-                     [reagent-utils "0.1.8" :scope "test"]
-                     [hiccup "1.0.5" :scope "test"]
-                     [secretary "1.2.3" :scope "test"]
-                     [venantius/accountant "0.1.7" :scope "test"]
-                     [com.cognitect/transit-cljs "0.8.237" :scope "test"]
-                     [adzerk/cljs-console "0.1.1" :scope "test"]])
+(def frontend-deps (into common-deps
+                         '[[org.clojure/clojurescript "1.8.51" :scope "test"]
+                           [org.clojure/core.async "0.2.374" :scope "test"]
+                           [reagent "0.5.1" :exclusions [org.clojure/tools.reader] :scope "test"]
+                           [reagent-forms "0.5.23" :scope "test"]
+                           [reagent-utils "0.1.8" :scope "test"]
+                           [hiccup "1.0.5" :scope "test"]
+                           [secretary "1.2.3" :scope "test"]
+                           [venantius/accountant "0.1.7" :scope "test"]
+                           [com.cognitect/transit-cljs "0.8.237" :scope "test"]
+                           [adzerk/cljs-console "0.1.1" :scope "test"]]))
 <% endif %>
 (set-env! :source-paths #{"dev"}
-          :dependencies common-deps)
+          :dependencies cmd-line-deps)
 
 (require 'boot
          '[clojure.pprint :refer [pprint]]
