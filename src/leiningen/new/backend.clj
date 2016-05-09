@@ -28,13 +28,11 @@
    ["src/backend/{{sanitized}}/logging.clj" "common/src/backend/logging.clj"]
 
    ;; tests
-   ["test/backend/{{sanitized}}/test/system.clj" "common/test/backend/test/system.clj"]
-   ["test/backend/{{sanitized}}/example_test.clj" "common/test/backend/example_test.clj"]])
+   ["test/backend/{{sanitized}}/system_test.clj" "common/test/backend/system_test.clj"]])
 
 (defn features
   "Return a vector [assets options] with added stuff if necessary."
   [[assets options]]
   (if-let [features (seq (set/intersection #{"+backend"} (:features options)))]
-    [(into assets my-assets) (assoc options :backend {:mount true
-                                                      :timbre true})]
+    [(into assets my-assets) (assoc options :backend {:features #{:mount :log4j2}})]
     [assets options]))

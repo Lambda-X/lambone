@@ -21,5 +21,5 @@
   "Return a vector [assets options] with added stuff if necessary."
   [[assets options]]
   (if-let [features (seq (set/intersection #{"+frontend"} (:features options)))]
-    [(into assets my-assets) (assoc options :frontend {:cljs true})]
+    [(into assets my-assets) (assoc options :frontend {:features #{:cljs-console :sass}})]
     [assets options]))
