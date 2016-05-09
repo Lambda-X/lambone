@@ -1,7 +1,8 @@
 (ns <<project-ns>>.app-test
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.test :refer-macros [deftest is async]]
-            [cljs.core.async :as async :refer [chan put! <!]])
-  (:require-macros [cljs.core.async.macros :refer [go]]))
+            [cljs.core.async :as async :refer [chan put! <!]]
+            [<<project-ns>>.app :as app]))
 
 (deftest sanity-check
   (is (= 1 1)))

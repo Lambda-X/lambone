@@ -8,8 +8,8 @@
    ;; html/css/sass stuff
    ["assets/greg.svg" "common/assets/greg.svg"]
    ["assets/index.html" "common/assets/index.html"]
-   ["sass/variables.scss" "common/sass/variables.scss"]
-   ["sass/app.scss" "common/sass/app.scss"]
+   ["src/frontend/css/variables.scss" "common/src/frontend/css/variables.scss"]
+   ["src/frontend/css/app.scss" "common/src/frontend/css/app.scss"]
    "assets/css"
    "assets/img"
 

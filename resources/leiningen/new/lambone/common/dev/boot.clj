@@ -120,9 +120,10 @@
   specified."
   [options out-folder?]
   (apply-options! options)
-  (require 'adzerk.boot-cljs)
+  (require 'adzerk.boot-cljs
+           'deraen.boot-sass)
   (let [cljs (resolve 'adzerk.boot-cljs/cljs)
-        sass (resolve 'mathias.boot-sassc/sass)]
+        sass (resolve 'deraen.boot-sass/sass)]
     (comp (with-pass-thru _
             (boot.util/info "Building frontend %s profile...\n" type)
             (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
@@ -139,14 +140,13 @@
   (apply-options! options)
   (require 'adzerk.boot-cljs
            'adzerk.boot-cljs-repl
-           'adzerk.boot-reload
-           'mathias.boot-sassc
-           'pandeiro.boot-http)
+           'deraen.boot-sass
+           'adzerk.boot-reload)
   (let [reload (resolve 'adzerk.boot-reload/reload)
         cljs-repl (resolve 'adzerk.boot-cljs-repl/cljs-repl)
         cljs (resolve 'adzerk.boot-cljs/cljs)
         cljs-build-deps (resolve 'adzerk.boot-cljs/deps)
-        sass (resolve 'mathias.boot-sassc/sass)]
+        sass (resolve 'deraen.boot-sass/sass)]
     (comp (built-in/watch)
           (apply sass (flatten (seq (:sass options))))
           (apply reload (flatten (seq (:reload options))))
