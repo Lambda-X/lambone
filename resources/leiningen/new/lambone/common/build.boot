@@ -41,13 +41,6 @@
 (def frontend-deps (into common-deps
                          '[[org.clojure/clojurescript "1.8.51" :scope "test"]
                            [org.clojure/core.async "0.2.374" :scope "test"]
-                           [reagent "0.5.1" :exclusions [org.clojure/tools.reader] :scope "test"]
-                           [reagent-forms "0.5.23" :scope "test"]
-                           [reagent-utils "0.1.8" :scope "test"]
-                           [hiccup "1.0.5" :scope "test"]
-                           [secretary "1.2.3" :scope "test"]
-                           [venantius/accountant "0.1.7" :scope "test"]
-                           [com.cognitect/transit-cljs "0.8.237" :scope "test"]
                            [adzerk/cljs-console "0.1.1" :scope "test"]]))
 <% endif %>
 (set-env! :source-paths #{"dev"}
