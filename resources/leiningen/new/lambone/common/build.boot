@@ -5,7 +5,7 @@
 (def cmd-line-deps '[[degree9/boot-semver "1.2.4" :scope "test"]
                      [adzerk/env "0.3.0" :scope "test"]
                      [pandeiro/boot-http "0.7.3" :scope "test"]])
-
+<% if all backend frontend %>
 (def common-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]])
 
 (def backend-deps (into common-deps
@@ -25,7 +25,25 @@
                           ;; dev only
                           [adzerk/boot-test "1.1.1" :scope "test"]
                           [adzerk/env "0.3.0" :scope "test"]]))
-<% if any frontend %>
+<% endif %><% if not all backend frontend %>
+(def backend-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]
+                    [org.clojure/tools.namespace "0.2.10"]
+                    [org.clojure/tools.reader "0.10.0"]
+                    [org.clojure/tools.cli "0.3.3"]
+                    [org.clojure/tools.logging "0.3.1"]
+                    [org.apache.logging.log4j/log4j-api "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-core "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-jcl "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-jul "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-1.2-api "2.5" :scope "runtime"]
+                    [org.apache.logging.log4j/log4j-slf4j-impl "2.5" :scope "runtime"]
+                    [mount "0.1.10"]
+                    [robert/hooke "1.3.0"]
+                    [cprop "0.1.7"]
+                    ;; dev only
+                    [adzerk/boot-test "1.1.1" :scope "test"]
+                    [adzerk/env "0.3.0" :scope "test"]])
+<% endif %><% if any frontend %>
 ;; All the deps are "test" because they are only need for compiling to
 ;; JavaScript, not "real" project dependencies.
 (def frontend-deps (into common-deps
@@ -180,7 +198,6 @@
                              :compiler-options dev-compiler-options}))
         (assoc :test-cljs (merge optimizations
                                  {:cljs-opts dev-compiler-options})))))
-
 <% endif %>
 ;;;;;;;;;;;;;;;;;;
 ;;  MAIN TASKS  ;;
@@ -227,8 +244,8 @@
       :frontend (dev-frontend)<% endif %><% if all backend frontend %>
       (comp (dev-backend)
             (dev-frontend)))))<% endif %><% if not all backend frontend %>
-(comp (dev-backend)
-      (wait)))))<% endif %>
+      (comp (dev-backend)
+            (wait)))))<% endif %>
 
 (ns-unmap 'boot.user 'test)
 
@@ -249,10 +266,10 @@
    n namespace  NS         #{sym}   "Override and test only this namespace"
    e exclusion  REGEX      #{sym}   "Exclude this namespace"]
   (let [<% if any backend %>test-backend #(-> (boot/options [:backend :test])
-                                              (boot/boot-test-opts namespace exclusion)
-                                              boot/test-backend)<% endif %><% if any frontend %>
+                          (boot/boot-test-opts namespace exclusion)
+                          boot/test-backend)<% endif %><% if any frontend %>
         test-frontend #(-> (boot/options [:frontend :test])
-                           (boot/boot-cljs-test-opts namespace true)
+                           (boot/boot-cljs-test-opts namespace)
                            boot/test-frontend)<% endif %>]
     (case flavor
       <% if any backend %>:backend (test-backend)<% endif %>

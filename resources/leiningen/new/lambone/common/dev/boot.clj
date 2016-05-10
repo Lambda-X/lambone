@@ -160,11 +160,10 @@
             identity))))
 
 (defn boot-cljs-test-opts
-  [options namespaces exit?]
+  [options namespaces]
   (cond-> options
     namespaces (-> (update-in [:test-cljs :suite-ns] (fn [_] nil))
-                   (assoc-in [:test-cljs :namespaces] namespaces))
-    exit? (assoc-in [:test-cljs :exit?] exit?)))
+                   (assoc-in [:test-cljs :namespaces] namespaces))))
 
 (defn test-frontend
   "Run tests once.
@@ -180,4 +179,5 @@
         (with-pre-wrap fs
           (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)
                 middleware (apply test-cljs (flatten (seq (:test-cljs options))))]
-            ((middleware identity) fs)))))<% endif %>
+            ((middleware identity) fs)))))
+<% endif %>

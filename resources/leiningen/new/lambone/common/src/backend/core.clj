@@ -46,7 +46,8 @@
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop))
   (apply f args))
 
-(defn -main [& args]
+(defn -main
+  [& args]
   (hooke/add-hook #'<<project-ns>>.core/stop #'<<project-ns>>.core/main-stop)
   (hooke/add-hook #'<<project-ns>>.core/start #'<<project-ns>>.core/main-start)
   (start args))
