@@ -105,14 +105,15 @@
 (defn test-backend
   "Run tests once for the backend (uses clojure.test)."
   [options]
-  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
-  (apply-options! options)
-  (require 'adzerk.boot-test)
-  (let [test (resolve 'adzerk.boot-test/test)]
-    (comp (with-pass-thru _
-            (util/info "Testing the backend, prepend with watch for auto testing...\n"))
-          (apply test (flatten (seq (:test options)))))))
-<% endif %><% if any frontend %>
+  (comp (with-pass-thru _
+          (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+          (apply-options! options)
+          (require 'adzerk.boot-test))
+        (with-pre-wrap fs
+          (let [test (resolve 'adzerk.boot-test/test)
+                middleware (apply test (flatten (seq (:test options))))]
+            ((middleware identity) fs)))))<% endif %>
+<% if any frontend %>
 (defn build-frontend
   "Return a boot task for building the frontend.
 
@@ -170,11 +171,11 @@
   optionally accepts (a set of) symbols that are used for testing only
   some namespaces."
   [options]
-  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
-  (apply-options! options)
-  (require 'crisptrutski.boot-cljs-test)
-  (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)]
-    (comp (with-pass-thru _
-            (util/info "Testing the frontend, prepend with watch for auto testing...\n"))
-          (apply test-cljs (flatten (seq (:test-cljs options)))))))
-<% endif %>
+  (comp (with-pass-thru _
+          (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+          (apply-options! options)
+          (require 'crisptrutski.boot-cljs-test))
+        (with-pre-wrap fs
+          (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)
+                middleware (apply test-cljs (flatten (seq (:test-cljs options))))]
+            ((middleware identity) fs)))))<% endif %>
