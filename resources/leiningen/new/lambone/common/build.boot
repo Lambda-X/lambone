@@ -6,10 +6,7 @@
                      [adzerk/env "0.3.0" :scope "test"]
                      [pandeiro/boot-http "0.7.3" :scope "test"]])
 
-(def common-deps '[[org.clojure/clojure "1.8.0" :scope "test"]])
-
-(def backend-dev-deps '[[adzerk/boot-test "1.1.1"]
-                        [adzerk/env "0.3.0" :scope "test"]])
+(def common-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]])
 
 (def backend-deps (into common-deps
                         '[[org.clojure/tools.namespace "0.2.10"]
@@ -24,25 +21,28 @@
                           [org.apache.logging.log4j/log4j-slf4j-impl "2.5" :scope "runtime"]
                           [mount "0.1.10"]
                           [robert/hooke "1.3.0"]
-                          [cprop "0.1.7"]]))
+                          [cprop "0.1.7"]
+                          ;; dev only
+                          [adzerk/boot-test "1.1.1" :scope "test"]
+                          [adzerk/env "0.3.0" :scope "test"]]))
 <% if any frontend %>
-(def frontend-dev-deps '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
-                         [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
-                         [adzerk/boot-reload "0.4.4" :scope "test"]
-                         [deraen/boot-sass "0.2.1" :scope "test"]
-                         [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
-                         [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
-                         [com.cemerick/piggieback "0.2.1" :scope "test"]
-                         [weasel "0.7.0" :scope "test"]
-                         [org.clojure/tools.nrepl "0.2.12" :scope "test"]
-                         [org.slf4j/slf4j-nop "1.7.21"]])
-
 ;; All the deps are "test" because they are only need for compiling to
 ;; JavaScript, not "real" project dependencies.
 (def frontend-deps (into common-deps
                          '[[org.clojure/clojurescript "1.8.51" :scope "test"]
                            [org.clojure/core.async "0.2.374" :scope "test"]
-                           [adzerk/cljs-console "0.1.1" :scope "test"]]))
+                           [adzerk/cljs-console "0.1.1" :scope "test"]
+                           ;; dev only
+                           [adzerk/boot-cljs "1.7.228-1" :scope "test"]
+                           [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
+                           [adzerk/boot-reload "0.4.4" :scope "test"]
+                           [deraen/boot-sass "0.2.1" :scope "test"]
+                           [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
+                           [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
+                           [com.cemerick/piggieback "0.2.1" :scope "test"]
+                           [weasel "0.7.0" :scope "test"]
+                           [org.clojure/tools.nrepl "0.2.12" :scope "test"]
+                           [org.slf4j/slf4j-nop "1.7.21" :scope "test"]]))
 <% endif %>
 (set-env! :source-paths #{"dev"}
           :dependencies cmd-line-deps)
@@ -85,13 +85,10 @@
          :file "<<project-ns>>-standalone.jar"}
    :aot {:all true}})
 
-(def backend-dev-dependencies
-  (vec (distinct (concat backend-dev-deps backend-deps))))
-
 (defmethod boot/options [:backend :dev]
   [selection]
   (merge backend-options
-         {:env {:dependencies backend-dev-dependencies
+         {:env {:dependencies backend-deps
                 :source-paths #{"src/backend" "env/dev/src"}
                 :resource-paths #{"env/dev/resources"}}}))
 
@@ -106,7 +103,7 @@
   [selection]
   (merge backend-options
          {:test {:namespaces #{'<<project-ns>>.system-test}}
-          :env {:dependencies backend-dev-dependencies
+          :env {:dependencies backend-deps
                 :middleware @@(resolve 'boot.repl/*default-middleware*)
                 :source-paths #{"src/backend" "test/backend" "env/dev/src"}
                 :resource-paths #{"env/dev/resources"}}}))
@@ -144,7 +141,7 @@
 (def frontend-options
   {:env {:source-paths #{"src/frontend"}
          :asset-paths #{"assets"}
-         :dependencies (vec (distinct (concat frontend-dev-deps frontend-deps)))}
+         :dependencies frontend-deps}
    :reload {:on-jsload '<<project-ns>>.app/init}
    :cljs-repl {:nrepl-opts {:port 5088}}
    :test-cljs {:suite-ns '<<project-ns>>.suite}})
@@ -168,8 +165,7 @@
         (assoc :props {"CLJS_LOG_LEVEL" "INFO"})
         (update-in [:env :source-paths] conj "env/prod/src")
         (assoc :cljs (merge optimizations
-                            {:source-map false
-                             :compiler-options prod-compiler-options}))
+                            {:compiler-options prod-compiler-options}))
         (assoc :test-cljs (merge optimizations
                                  {:cljs-opts prod-compiler-options})))))
 
@@ -209,7 +205,6 @@
   (let [type (or type :prod)
         flavor (or flavor (keyword (get (env/env) "BOOT_BUILD_FLAVOR")))
         options (boot/options [flavor type])]
-    (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
     (util/info "Will build the [%1s %2s] profile...\n" flavor type)
     (case flavor
       <% if any backend %>:backend (boot/build-backend options)<% endif %><% if any frontend %>
