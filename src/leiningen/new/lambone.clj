@@ -14,7 +14,6 @@
   "Create a new Lambone project, after this point the features are
   represented as keys."
   [options features]
-  (main/info "Generating a project with features:" features)
   (let [options (assoc options :features features)
         [assets options] (-> [[] options]
                              (backend/features)

@@ -144,7 +144,7 @@
 (def frontend-options
   {:env {:source-paths #{"src/frontend"}
          :asset-paths #{"assets"}
-         :dependencies (vec (concat frontend-dev-deps frontend-deps))}
+         :dependencies (vec (distinct (concat frontend-dev-deps frontend-deps)))}
    :reload {:on-jsload '<<project-ns>>.app/init}
    :cljs-repl {:nrepl-opts {:port 5088}}
    :test-cljs {:suite-ns '<<project-ns>>.suite}})

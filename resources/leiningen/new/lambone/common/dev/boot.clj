@@ -98,7 +98,7 @@
 
 (defn boot-test-opts
   [options namespaces exclusions]
-  (cond-> (boot/options [:backend :test])
+  (cond-> options
     namespaces (assoc-in [:test :namespaces] namespaces)
     exclusions (assoc-in [:test :exclusions] exclusions)))
 
