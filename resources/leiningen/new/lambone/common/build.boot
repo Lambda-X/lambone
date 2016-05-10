@@ -34,7 +34,8 @@
                          [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
                          [com.cemerick/piggieback "0.2.1" :scope "test"]
                          [weasel "0.7.0" :scope "test"]
-                         [org.clojure/tools.nrepl "0.2.12" :scope "test"]])
+                         [org.clojure/tools.nrepl "0.2.12" :scope "test"]
+                         [org.slf4j/slf4j-nop "1.7.21"]])
 
 ;; All the deps are "test" because they are only need for compiling to
 ;; JavaScript, not "real" project dependencies.
@@ -114,6 +115,11 @@
 ;;  FRONTEND OPTIONS  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
+(def optimizations
+  {:prod {:optimizations :advanced}
+   :dev {:optimizations :none}
+   :test {:optimizations :none}})
+
 (def foreign-libs
   "Specify ClojureScript foreign libs as a vector of {:file ... :provides []} maps.
   See https://github.com/clojure/clojurescript/wiki/Compiler-Options#foreign-libs"
@@ -136,52 +142,48 @@
           :closure-defines {"goog.DEBUG" true}}))
 
 (def frontend-options
-  {:env {:source-paths #{"sass" "src/frontend"}
+  {:env {:source-paths #{"src/frontend"}
          :asset-paths #{"assets"}
          :dependencies (vec (concat frontend-dev-deps frontend-deps))}
    :reload {:on-jsload '<<name>>.app/init}
    :cljs-repl {:nrepl-opts {:port 5088}}
-   :sass {:sass-file "app.scss"
-          :output-dir "."
-          :line-numbers true
-          :source-maps true}
-   :test-cljs {:optimizations :simple
-               :suite-ns '<<name>>.suite}})
+   :test-cljs {:suite-ns '<<project-ns>>.suite}})
 
 (defmethod boot/options [:frontend :dev]
   [selection]
-  (-> frontend-options
-      (merge {:props {"CLJS_LOG_LEVEL" "DEBUG"}
-              :cljs {:source-map true
-                     :optimizations :simple
-                     :compiler-options dev-compiler-options}})
-      (update-in [:env :source-paths] conj "env/dev/src")
-      (assoc :cljs {:source-map true
-                    :optimizations :simple
-                    :compiler-options dev-compiler-options})
-      (assoc-in [:test-cljs :cljs-opts] dev-compiler-options)))
+  (let [optimizations (:dev optimizations)]
+    (-> frontend-options
+        (assoc :props {"CLJS_LOG_LEVEL" "DEBUG"})
+        (update-in [:env :source-paths] conj "env/dev/src")
+        (assoc :cljs (merge (:dev optimizations)
+                            {:source-map true
+                             :compiler-options dev-compiler-options}))
+        (assoc :test-cljs (merge (:dev optimizations)
+                                 {:cljs-opts dev-compiler-options})))))
 
 (defmethod boot/options [:frontend :prod]
   [selection]
-  (-> frontend-options
-      (merge {:props {"CLJS_LOG_LEVEL" "INFO"}
-              :cljs {:source-map true
-                     :optimizations :advanced
-                     :compiler-options prod-compiler-options}})
-      (update-in [:env :source-paths] conj "env/prod/src")
-      (assoc :cljs {:source-map true
-                    :optimizations :advanced
-                    :compiler-options prod-compiler-options})
-      (assoc-in [:test-cljs :cljs-opts] prod-compiler-options)))
+  (let [optimizations (:prod optimizations)]
+    (-> frontend-options
+        (assoc :props {"CLJS_LOG_LEVEL" "INFO"})
+        (update-in [:env :source-paths] conj "env/prod/src")
+        (assoc :cljs (merge optimizations
+                            {:source-map false
+                             :compiler-options prod-compiler-options}))
+        (assoc :test-cljs (merge optimizations
+                                 {:cljs-opts prod-compiler-options})))))
 
 (defmethod boot/options [:frontend :test]
   [selection]
-  (-> frontend-options
-      (merge {:props {"CLJS_LOG_LEVEL" "DEBUG"}
-              :cljs {:source-map true
-                     :optimizations :simple
-                     :compiler-options dev-compiler-options}})
-      (update-in [:env :source-paths] conj "test/frontend")))
+  (let [optimizations (:test optimizations)]
+    (-> frontend-options
+        (assoc :props {"CLJS_LOG_LEVEL" "DEBUG"})
+        (update-in [:env :source-paths] conj "env/dev/src" "test/frontend")
+        (assoc :cljs (merge optimizations
+                            {:source-map true
+                             :compiler-options dev-compiler-options}))
+        (assoc :test-cljs (merge optimizations
+                                 {:cljs-opts dev-compiler-options})))))
 
 <% endif %>
 ;;;;;;;;;;;;;;;;;;
