@@ -81,8 +81,8 @@
 (def backend-options
   {:repl {:init-ns 'dev
           :port 5055}
-   :jar {:main '<<name>>.core
-         :file "<<name>>-standalone.jar"}
+   :jar {:main '<<project-ns>>.core
+         :file "<<project-ns>>-standalone.jar"}
    :aot {:all true}})
 
 (def backend-dev-dependencies
@@ -105,7 +105,7 @@
 (defmethod boot/options [:backend :test]
   [selection]
   (merge backend-options
-         {:test {:namespaces #{'acu.system-test}}
+         {:test {:namespaces #{'<<project-ns>>.system-test}}
           :env {:dependencies backend-dev-dependencies
                 :middleware @@(resolve 'boot.repl/*default-middleware*)
                 :source-paths #{"src/backend" "test/backend" "env/dev/src"}
@@ -145,7 +145,7 @@
   {:env {:source-paths #{"src/frontend"}
          :asset-paths #{"assets"}
          :dependencies (vec (concat frontend-dev-deps frontend-deps))}
-   :reload {:on-jsload '<<name>>.app/init}
+   :reload {:on-jsload '<<project-ns>>.app/init}
    :cljs-repl {:nrepl-opts {:port 5088}}
    :test-cljs {:suite-ns '<<project-ns>>.suite}})
 
