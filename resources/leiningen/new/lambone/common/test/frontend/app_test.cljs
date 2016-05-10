@@ -1,7 +1,5 @@
 (ns <<project-ns>>.app-test
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.test :refer-macros [deftest is async]]
-            [cljs.core.async :as async :refer [chan put! <!]]
             [<<project-ns>>.app :as app]))
 
 (deftest sanity-check
@@ -16,12 +14,3 @@
                        (done))
                      100)
       (is (= 1 a)))))
-
-(deftest csp-test
-  (async done
-    (let [val 1
-          ch (chan)]
-      (go (let [a (<! ch)]
-            (is (= a val))
-            (done)))
-      (put! ch val))))

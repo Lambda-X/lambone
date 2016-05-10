@@ -48,7 +48,6 @@
 ;; JavaScript, not "real" project dependencies.
 (def frontend-deps (into common-deps
                          '[[org.clojure/clojurescript "1.8.51" :scope "test"]
-                           [org.clojure/core.async "0.2.374" :scope "test"]
                            [adzerk/cljs-console "0.1.1" :scope "test"]
                            ;; dev only
                            [adzerk/boot-cljs "1.7.228-1" :scope "test"]
