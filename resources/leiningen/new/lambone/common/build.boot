@@ -189,16 +189,16 @@
 (deftask build
   "Build the final artifact.
 
-   In order to allow task chaining (\"boot build deploy\" at the cmd line for
-   instance), building all flavors at the same time is not supported at the
-   moment. This means that the build task requires a --flavor and if missing it
-   will read it from BOOT_BUILD_FLAVOR.
+  In order to allow task chaining (\"boot build deploy\" at the cmd line for
+  instance), building all flavors at the same time is not supported at the
+  moment. This means that the build task requires a --flavor and if missing it
+  will read it from BOOT_BUILD_FLAVOR.
 
-   Optionally you can specify a build type (dev or prod are supported out of
-   the box). If no type is passed in, prod will be build.
+  Optionally you can specify a build type (dev or prod are supported out of
+  the box). If no type is passed in, prod will be build.
 
-   The option --o|--out-folder will keep the main.out folder in the fileset,
-   which is otherwise removed."
+  The option --o|--out-folder will keep the main.out folder in the fileset,
+  which is otherwise removed."
   [f flavor VAL kw   "The flavor"
    t type   VAL kw   "The build type, either prod or dev"
    o out-folder bool "Include main.out folder."]
@@ -235,16 +235,16 @@
 (deftask test
   "Run tests once.
 
-   If no flavor is specified, all the tests for all the flavors will be
-   triggered.
+  If no flavor is specified, all the tests for all the flavors will be
+  triggered.
 
-   If no type is passed in, it tests against the production build.
+  If no type is passed in, it tests against the production build.
 
-   If no namespace option is specified, it tests all the namespaces in the
-   classpath except the symbols in the exclusion set.
+  If no namespace option is specified, it tests all the namespaces in the
+  classpath except the symbols in the exclusion set.
 
-   In order to enable auto testing, prepend this task with watch, e.g. boot
-   watch test."
+  In order to enable auto testing, prepend this task with watch, e.g. boot
+  watch test."
   [f flavor     VAL        kw        "The flavor"
    n namespace  NS         #{sym}   "Override and test only this namespace"
    e exclusion  REGEX      #{sym}   "Exclude this namespace"]

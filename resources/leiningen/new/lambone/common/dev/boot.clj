@@ -53,10 +53,8 @@
   (apply-options! options)
   (let [jar-name (get-in options [:jar :file])]
     (comp (with-pass-thru _
-            (util/info "Generating %s...\n" jar-name))
-          (if (> @boot.util/*verbosity* 2)
-            (built-in/show :deps true)
-            identity)
+            (util/dbug "Options:\n%s\n" (with-out-str (pprint options))))
+          (version-file)
           (apply built-in/aot (flatten (seq (:aot options))))
           (apply built-in/uber (flatten (seq (:uber options))))
           (apply built-in/jar (flatten (seq (:jar options))))
@@ -79,22 +77,25 @@
   (let [pod-env (make-pod-env (:env options))
         pod (future (pod/make-pod pod-env))
         {:keys [port init-ns]} (:repl options)]
-    (util/dbug "Pod env:\n%s\n" (with-out-str (pprint pod-env)))
-    (with-pass-thru _
-      (pod/with-eval-in @pod
-        (require '[boot.pod :as pod])
-        (require '[boot.util :as util])
-        (require '[boot.repl :as repl])
-        (require '[clojure.tools.namespace.repl :as tnsr])
+    (comp
+     (with-pass-thru _
+       (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+       (util/dbug "Pod env:\n%s\n" (with-out-str (pprint pod-env))))
+     (with-pass-thru _
+       (pod/with-eval-in @pod
+         (require '[boot.pod :as pod])
+         (require '[boot.util :as util])
+         (require '[boot.repl :as repl])
+         (require '[clojure.tools.namespace.repl :as tnsr])
 
-        (apply tnsr/set-refresh-dirs (-> pod/env :directories))
-        (repl/launch-nrepl {:init-ns '~init-ns
-                            :port '~port
-                            :server true
-                            :middleware (:middleware pod/env)})
-        ;; Auto-start the system
-        (require 'dev)
-        (dev/go)))))
+         (apply tnsr/set-refresh-dirs (-> pod/env :directories))
+         (repl/launch-nrepl {:init-ns '~init-ns
+                             :port '~port
+                             :server true
+                             :middleware (:middleware pod/env)})
+         ;; Auto-start the system
+         (require 'dev)
+         (dev/go))))))
 
 (defn boot-test-opts
   [options namespaces exclusions]
@@ -126,8 +127,8 @@
   (let [cljs (resolve 'adzerk.boot-cljs/cljs)
         sass (resolve 'deraen.boot-sass/sass)]
     (comp (with-pass-thru _
-            (boot.util/info "Building frontend %s profile...\n" type)
-            (util/dbug "Env :dependencies:\n%s\n" (string/join "\n" (:dependencies (get-env)))))
+            (util/dbug "Options:\n%s\n" (with-out-str (pprint options))))
+          (version-file)
           (apply sass (flatten (seq (:sass options))))
           (apply cljs (flatten (seq (:cljs options))))
           (if-not out-folder?
@@ -149,6 +150,7 @@
         cljs-build-deps (resolve 'adzerk.boot-cljs/deps)
         sass (resolve 'deraen.boot-sass/sass)]
     (comp (built-in/watch)
+          (version-file)
           (apply sass (flatten (seq (:sass options))))
           (apply reload (flatten (seq (:reload options))))
           (apply cljs-repl (flatten (seq (:cljs-repl options))))
