@@ -179,5 +179,4 @@
         (with-pre-wrap fs
           (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)
                 middleware (apply test-cljs (flatten (seq (:test-cljs options))))]
-            ((middleware identity) fs)))))
-<% endif %>
+            ((middleware identity) fs)))))<% endif %>
