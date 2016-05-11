@@ -12,7 +12,7 @@ division is present throughout the project, from boot dependencies
 (`backend-deps` vs `frontend-deps` in `build.boot`) to source files
 organization (`src/backend` vs `src/frontend`).
 
-It is bare in the sense that it does not include any anything more than:
+It is bare in the sense that it does not include anything more than:
 
 * Backend
  * [mount](https://github.com/tolitius/mount)
