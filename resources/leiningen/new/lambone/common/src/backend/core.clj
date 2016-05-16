@@ -46,6 +46,11 @@
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop))
   (apply f args))
 
+(Thread/setDefaultUncaughtExceptionHandler
+ (reify Thread$UncaughtExceptionHandler
+   (uncaughtException [_ thread ex]
+     (log/error ex "Uncaught exception on" (.getName thread)))))
+
 (defn -main
   [& args]
   (hooke/add-hook #'<<project-ns>>.core/stop #'<<project-ns>>.core/main-stop)
