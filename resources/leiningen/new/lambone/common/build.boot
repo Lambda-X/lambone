@@ -274,8 +274,18 @@
       <% if any backend %>:backend (test-backend)<% endif %>
       <% if any frontend %>:frontend (test-frontend)<% endif %><% if all backend frontend %>
       (comp (test-backend)
-            (test-frontend)))))
-<% endif %><% if not all backend frontend %>(test-backend))))<% endif %>
+            (test-frontend)))))<% endif %><% if not all backend frontend %>(test-backend))))<% endif %>
+
+(deftask deps
+  "Show the dependency tree
+
+  If no -f|--flavor is specified it will be read from BOOT_BUILD_FLAVOR.
+  If no -t|--type is specified the task will assume :prod."
+  [f flavor VAL kw   "The flavor"
+   t type   VAL kw   "The build type, either prod or dev"]
+  (let [type (or type :prod)
+        flavor (or flavor (keyword (get (env/env) "BOOT_BUILD_FLAVOR")))]
+    (boot/deps (boot/options [flavor type]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  see dev/boot.clj for task customization  ;;
