@@ -62,7 +62,8 @@
                            [org.slf4j/slf4j-nop "1.7.21" :scope "test"]]))
 <% endif %>
 (set-env! :source-paths #{"dev"}
-          :dependencies cmd-line-deps)
+          :dependencies cmd-line-deps
+          :exclusions '#{org.clojure/clojure})
 
 (require 'boot
          '[clojure.pprint :refer [pprint]]
