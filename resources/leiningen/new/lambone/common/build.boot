@@ -97,7 +97,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (def backend-options
-  {:repl {:init-ns 'dev
+  {:env {:dependencies backend-deps
+         :source-paths #{"src/backend" "src/common"}}
+   :repl {:init-ns 'dev
           :port 5055}
    :jar {:main '<<project-ns>>.core
          :file "<<project-ns>>-standalone.jar"}
@@ -105,26 +107,23 @@
 
 (defmethod boot/options [:backend :dev]
   [selection]
-  (merge backend-options
-         {:env {:dependencies backend-deps
-                :source-paths #{"src/backend" "env/dev/src"}
-                :resource-paths #{"env/dev/resources"}}}))
+  (-> backend-options
+      (update-in [:env :source-paths] conj "env/dev/src")
+      (assoc-in [:env :resource-paths] #{"env/dev/resources"})
+      (assoc-in [:env :middleware] @@(resolve 'boot.repl/*default-middleware*))))
 
 (defmethod boot/options [:backend :prod]
   [selection]
-  (merge backend-options
-         {:env {:dependencies backend-deps
-                :source-paths #{"src/backend" "env/prod/src"}
-                :resource-paths #{"env/prod/resources"}}}))
+  (-> backend-options
+      (update-in [:env :source-paths] conj "env/prod/src")
+      (assoc-in [:env :resource-paths] #{"env/prod/resources"})))
 
 (defmethod boot/options [:backend :test]
   [selection]
-  (merge backend-options
-         {:test {:namespaces #{'<<project-ns>>.system-test}}
-          :env {:dependencies backend-deps
-                :middleware @@(resolve 'boot.repl/*default-middleware*)
-                :source-paths #{"src/backend" "test/backend" "env/dev/src"}
-                :resource-paths #{"env/dev/resources"}}}))
+  (-> backend-options
+      (update-in [:env :source-paths] conj "test/backend" "env/dev/src")
+      (assoc-in [:env :resource-paths] #{"env/test/resources"})
+      (assoc-in [:test :namespaces] #{'<<project-ns>>.system-test})))
 <% if any frontend %>
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  FRONTEND OPTIONS  ;;

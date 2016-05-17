@@ -23,6 +23,7 @@
    ["env/prod/src/{{sanitized}}/env.cljc" "common/env/prod/src/env.cljc"]
    ["env/test/src/{{sanitized}}/env.cljc" "common/env/test/src/env.cljc"]
 
+   ["src/common/{{sanitized}}/api.cljc" "common/src/common/api.cljc"]
    ["src/backend/{{sanitized}}/core.clj" "common/src/backend/core.clj"]
    ["src/backend/{{sanitized}}/system.clj" "common/src/backend/system.clj"]
    ["src/backend/{{sanitized}}/logging.clj" "common/src/backend/logging.clj"]
