@@ -6,6 +6,25 @@
             [boot.pod :as pod]
             [boot.task.built-in :as built-in]))
 
+(defmulti options
+  "Multi-method that return the correct option map for the build,
+  dispatching on identity.
+
+  The only rule that the option map needs to abide by is that each key
+  must match the boot task symbol name you want to configure.
+
+  Thence a map like
+
+  {:repl {:init-ns 'dev
+        :port 5055}
+   :jar {:main '<<name>>.core
+         :file \"<<name>>-standalone.jar\"}
+   :aot {:all true}}
+
+  will setup the `repl`, `jar` and `aot` boot built-in tasks
+  respectively."
+  identity)
+
 (deftask version-file
   "A task that includes the version.properties file in the fileset."
   []
@@ -21,10 +40,6 @@
   (doseq [kv m]
     (System/setProperty (key kv) (val kv))))
 
-(defmulti options
-  "Return the correct option map for the build, dispatching on identity"
-  identity)
-
 (defn apply-options!
   "Calls boot.core/set-env! (so don't call it twice) with the content of
   the :env key and System/setProperty for all the key/value pairs in
@@ -36,9 +51,18 @@
     (assert (or (nil? props) (map? props)) "Option :props should be a map.")
     (set-system-properties! props)))
 
+(defn show-deps
+  "Return a task that shows the dependency tree from the input option
+  map."
+  [options]
+  (comp (with-pass-thru _
+          (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+          (boot/apply-options! options))
+        (built-in/show :deps true)))
+
 (defn env->directories
   "Calculate the content of :directories (a set of string) given the
-  canonical (boot.core/get-env) map"
+  canonical (boot.core/get-env) map."
   [env]
   (reduce #(into %1 (get env %2))
           #{}
@@ -47,8 +71,8 @@
 (defn build-backend
   "Return a boot task for building the backend.
 
-   The artifact is the result of (comp (aot) (uber) (jar)) but no target is
-   appended."
+   The artifact is the result of (comp (aot) (uber) (jar)) but no target
+  is appended."
   [options]
   (apply-options! options)
   (let [jar-name (get-in options [:jar :file])]
@@ -60,7 +84,7 @@
           (apply built-in/jar (flatten (seq (:jar options))))
           (built-in/sift :include #{(re-pattern jar-name)}))))
 
-(defn make-pod-env
+(defn dev-backend-pod-env
   [current-env]
   (assoc current-env
          :directories (boot/env->directories current-env)
@@ -74,7 +98,7 @@
    Repl in a pod, inspired by https://github.com/juxt/edge"
   [options]
   (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
-  (let [pod-env (make-pod-env (:env options))
+  (let [pod-env (dev-backend-pod-env (:env options))
         pod (future (pod/make-pod pod-env))
         {:keys [port init-ns]} (:repl options)]
     (comp
@@ -104,7 +128,7 @@
     exclusions (assoc-in [:test :exclusions] exclusions)))
 
 (defn test-backend
-  "Run tests once for the backend (uses clojure.test)."
+  "Run tests once for the backend (it uses clojure.test)."
   [options]
   (comp (with-pass-thru _
           (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))

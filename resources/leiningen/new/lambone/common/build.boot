@@ -285,7 +285,7 @@
    t type   VAL kw   "The build type, either prod or dev"]
   (let [type (or type :prod)
         flavor (or flavor (keyword (get (env/env) "BOOT_BUILD_FLAVOR")))]
-    (boot/deps (boot/options [flavor type]))))
+    (boot/show-deps (boot/options [flavor type]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  see dev/boot.clj for task customization  ;;

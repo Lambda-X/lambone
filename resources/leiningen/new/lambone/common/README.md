@@ -43,6 +43,7 @@ The backend, which will exit immediately as it is "empty", can be started with:
 `java -jar <<project-ns>>-standalone.jar <<project-ns>>.core`
 <% if any frontend %>
 In case of backend *and* frontend, `boot build` does not actually build both cause we would lose boot's powerful task chaining. In that case, it is better to specify the flavor with `-f|--flavor` or to set the `BOOT_BUILD_FLAVOR` environment variable.<% endif %>
+
 #### Logging
 
 Logging is based on [clojure.tools.logging](https://github.com/clojure/tools.logging) and [Apache Log4j 2](https://logging.apache.org/log4j/2.x/).
