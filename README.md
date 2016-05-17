@@ -1,6 +1,6 @@
 # Lambone
 
-Lambone is an project template for bare backend + frontend projects.
+Lambone (/lamˈbone/) is an project template for bare backend + frontend projects.
 
 It proudly features [boot](http://boot-clj.com/) <img width="24px"
 height="24px"
