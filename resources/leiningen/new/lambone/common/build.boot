@@ -59,7 +59,8 @@
                            [com.cemerick/piggieback "0.2.1" :scope "test"]
                            [weasel "0.7.0" :scope "test"]
                            [org.clojure/tools.nrepl "0.2.12" :scope "test"]
-                           [org.slf4j/slf4j-nop "1.7.21" :scope "test"]]))
+                           [org.slf4j/slf4j-nop "1.7.21" :scope "test"]
+                           [pandeiro/boot-http "0.7.3" :scope "test"]]))
 <% endif %>
 (set-env! :source-paths #{"dev"}
           :dependencies cmd-line-deps
@@ -161,7 +162,9 @@
          :dependencies frontend-deps}
    :reload {:on-jsload '<<project-ns>>.app/init}
    :cljs-repl {:nrepl-opts {:port 5088}}
-   :test-cljs {:suite-ns '<<project-ns>>.suite}})
+   :test-cljs {:suite-ns '<<project-ns>>.suite}
+   :serve {:dir "assets"
+           :port 8000})
 
 (defmethod boot/options [:frontend :dev]
   [selection]

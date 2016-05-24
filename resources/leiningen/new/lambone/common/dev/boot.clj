@@ -167,13 +167,16 @@
   (require 'adzerk.boot-cljs
            'adzerk.boot-cljs-repl
            'deraen.boot-sass
-           'adzerk.boot-reload)
+           'adzerk.boot-reload
+           'pandeiro.boot-http)
   (let [reload (resolve 'adzerk.boot-reload/reload)
         cljs-repl (resolve 'adzerk.boot-cljs-repl/cljs-repl)
         cljs (resolve 'adzerk.boot-cljs/cljs)
         cljs-build-deps (resolve 'adzerk.boot-cljs/deps)
-        sass (resolve 'deraen.boot-sass/sass)]
-    (comp (built-in/watch)
+        sass (resolve 'deraen.boot-sass/sass)
+        serve (resolve 'pandeiro.boot-http/serve)]
+    (comp (apply serve (flatten (seq (:serve options))))
+          (built-in/watch)
           (version-file)
           (apply sass (flatten (seq (:sass options))))
           (apply reload (flatten (seq (:reload options))))
