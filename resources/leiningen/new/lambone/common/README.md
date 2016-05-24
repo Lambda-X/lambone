@@ -25,8 +25,8 @@ All of the boot commands accept a `-f|--flavor` and `-t|--type` that defines whi
 
 `boot dev` will launch:
 
- - A Clojure nRepl on port 5055
-<% if any frontend %> - A ClojureScript Repl on port 5088 (execute `((eval 'adzerk.boot-cljs-repl/start-repl))` and connect to [http://localhost:3000](http://localhost:3000) for seeing `cljs.user`)
+ - A Clojure nRepl on port 5055, the backend server itself exposed on port 3000
+<% if any frontend %> - A ClojureScript Repl on port 5088 (execute `((eval 'adzerk.boot-cljs-repl/start-repl))` and connect to [http://localhost:8000](http://localhost:8000) for seeing `cljs.user`)
 <% endif %>
 You can explore `env/dev/src/dev.clj` for getting acquainted with the system management tools. In there, `(dev/reset)` is the one that gives you the canonical reloaded workflow, featuring [mount](https://github.com/tolitius/mount).
 
