@@ -164,7 +164,7 @@
    :cljs-repl {:nrepl-opts {:port 5088}}
    :test-cljs {:suite-ns '<<project-ns>>.suite}
    :serve {:dir "assets"
-           :port 8000})
+           :port 8000}})
 
 (defmethod boot/options [:frontend :dev]
   [selection]
