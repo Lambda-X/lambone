@@ -1,0 +1,3 @@
+{:require  [<<project-ns>>.app]
+ :init-fns [<<project-ns>>.app/init]
+ :compiler-options {}}

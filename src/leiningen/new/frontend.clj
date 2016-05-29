@@ -10,6 +10,7 @@
    ["assets/index.html" "common/assets/index.html"]
    ["src/frontend/css/variables.scss" "common/src/frontend/css/variables.scss"]
    ["src/frontend/css/app.scss" "common/src/frontend/css/app.scss"]
+   ["src/frontend/main.cljs.edn" "common/src/frontend/main.cljs.edn"]
    "assets/css"
    "assets/img"
 
