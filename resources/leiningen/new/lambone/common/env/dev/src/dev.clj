@@ -31,20 +31,6 @@
   (start)
   :ready)
 
-(defn reset []
-  (stop)
-  (tnr/refresh :after 'dev/go))
-
-(defn refresh
-  []
-  (stop)
-  (tnr/refresh))
-
-(defn refresh-all
-  []
-  (stop)
-  (tnr/refresh-all))
-
 (defn test-all []
   (run-all-tests #"<<name>>.*test$"))
 

@@ -28,8 +28,26 @@ All of the boot commands accept a `-f|--flavor` and `-t|--type` that defines whi
  - A Clojure nRepl on port 5055, the backend server itself exposed on port 3000
 <% if any frontend %> - A ClojureScript Repl on port 5088
 <% endif %>
-You can explore `env/dev/src/dev.clj` for getting acquainted with the system management tools. In there, `(dev/reset)` is the one that gives you the canonical reloaded workflow, featuring [mount](https://github.com/tolitius/mount).
+You can explore `env/dev/src/dev.clj` for getting acquainted with the system management tools. You will notice that there is no `(dev/reset)` or call to `clojure.tools.namespace` in there.
+This is because Cursive already [has an opaque shortcut](https://cursive-ide.com/userguide/repl.html) to it while in [cider](https://github.com/clojure-emacs/cider) the following (configurable) function will give you an error-free reloaded worflow:
 
+```
+(defcustom cider-repl-refresh-after 'dev/go
+  "Symbol of a function that will be executed after
+  clojure.tools.namespace.repl/refresh."
+  :type 'string
+  :group 'cider)
+
+(defun cider-repl-refresh ()
+  (interactive)
+  (save-some-buffers)
+  (with-current-buffer (cider-current-repl-buffer)
+    (goto-char (point-max))
+    (insert (concat "(require 'clojure.tools.namespace.repl) "
+                    "(clojure.tools.namespace.repl/refresh :after "
+                    "'" (symbol-name cider-repl-refresh-after) ")"))
+    (cider-repl-return)))
+```
 <% if any frontend %>
 There is also an option for using Dirac instead of a regular cljs repl: you first need to follow Dirac's [installation](https://github.com/binaryage/dirac/blob/master/docs/installation.md) instructions, then you can launch `boot dev -d` and open the [Dirac Chrome Extension](https://chrome.google.com/webstore/detail/dirac-devtools/kbkdngfljkchidcjpnfcgcokkbhlkogi) at [http://localhost:8000](http://localhost:8000).<% endif %>
 ### Build

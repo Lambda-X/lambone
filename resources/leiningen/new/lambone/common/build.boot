@@ -10,7 +10,7 @@
                    [adzerk/env "0.3.0" :scope "test"]])
 
 (def backend-deps (into common-deps
-                        '[[org.clojure/tools.namespace "0.2.10"]
+                        '[[org.clojure/tools.namespace "0.3.0-alpha3"]
                           [org.clojure/tools.reader "0.10.0"]
                           [org.clojure/tools.cli "0.3.3"]
                           [org.clojure/tools.logging "0.3.1"]
