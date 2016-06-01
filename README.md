@@ -17,15 +17,14 @@ It is bare in the sense that it does not include anything more than:
 * Backend
  * [mount](https://github.com/tolitius/mount)
  * [cprop](https://github.com/tolitius/cprop)
-
+ * [log4j2](https://logging.apache.org/log4j/2.x/manual/index.html)
+ 
 * Frontend
  * [clojurescript](https://github.com/clojure/clojurescript)
  * [cljs-console](https://github.com/adzerk-oss/cljs-console)
  * [sass4clj](https://github.com/Deraen/sass4clj)
- 
-* Log4j2
- * For a list of advantages: https://logging.apache.org/log4j/2.x/manual/index.html
- 
+ * [dirac](https://github.com/binaryage/dirac)
+
 Why would you want to use `lambone` then?
 
 This template does not want by any means compete against Luminus, which the [current maintainer](https://github.com/arichiardi) is actually trying to [enhance](https://github.com/luminus-framework/luminus-template/issues/223) with boot support, but it does provide a couple of neat features that you can setup by yourself but are a bit cumbersome to remember every time you bootstrap a project:
@@ -36,7 +35,7 @@ This template does not want by any means compete against Luminus, which the [cur
 * Consistent hooks for taming Java logging and redirect all of it to log4j2
 * Canonical reload workflow and browser refreshing
 * Ready to use test harness (you only need to have PhantomJS on the target machine)
-* Switch from a Clojurescript Repl to a Dirac Repl at will (`-d/--dirac` option to the `dev` task)
+* Switch from a Clojurescript Repl to a [Dirac](https://github.com/binaryage/dirac) Repl at will (`-d/--dirac` option to the `dev` task)
 
 ## Usage
 
