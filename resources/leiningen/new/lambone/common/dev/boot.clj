@@ -71,17 +71,17 @@
 (defn build-backend
   "Return a boot task for building the backend.
 
-   The artifact is the result of (comp (aot) (uber) (jar)) but no target
-  is appended."
+   The artifact is the result of (comp (aot) (uber) (jar)) but no target is
+   appended."
   [options]
   (apply-options! options)
   (let [jar-name (get-in options [:jar :file])]
     (comp (with-pass-thru _
-            (util/dbug "Options:\n%s\n" (with-out-str (pprint options))))
+            (util/dbug "[build-backend] options:\n%s\n" (with-out-str (pprint options))))
           (version-file)
-          (apply built-in/aot (flatten (seq (:aot options))))
-          (apply built-in/uber (flatten (seq (:uber options))))
-          (apply built-in/jar (flatten (seq (:jar options))))
+          (apply built-in/aot (mapcat identity (:aot options)))
+          (apply built-in/uber (mapcat identity (:uber options)))
+          (apply built-in/jar (mapcat identity (:jar options)))
           (built-in/sift :include #{(re-pattern jar-name)}))))
 
 (defn dev-backend-pod-env
@@ -97,14 +97,13 @@
 
    Repl in a pod, inspired by https://github.com/juxt/edge"
   [options]
-  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
   (let [pod-env (dev-backend-pod-env (:env options))
         pod (future (pod/make-pod pod-env))
         {:keys [port init-ns]} (:repl options)]
     (comp
      (with-pass-thru _
-       (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
-       (util/dbug "Pod env:\n%s\n" (with-out-str (pprint pod-env))))
+       (util/dbug "[dev-backend] options:\n%s\n" (with-out-str (pprint options)))
+       (util/dbug "[dev-backend] pod env:\n%s\n" (with-out-str (pprint pod-env))))
      (with-pass-thru _
        (pod/with-eval-in @pod
          (require '[boot.pod :as pod])
@@ -128,15 +127,15 @@
     exclusions (assoc-in [:test :exclusions] exclusions)))
 
 (defn test-backend
-  "Run tests once for the backend (it uses clojure.test)."
+  "Run tests once for the backend (uses clojure.test)."
   [options]
   (comp (with-pass-thru _
-          (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+          (util/dbug "[test-backend] options:\n%s\n" (with-out-str (pprint options)))
           (apply-options! options)
           (require 'adzerk.boot-test))
         (with-pre-wrap fs
           (let [test (resolve 'adzerk.boot-test/test)
-                middleware (apply test (flatten (seq (:test options))))]
+                middleware (apply test (mapcat identity (:test options)))]
             ((middleware identity) fs)))))<% endif %>
 <% if any frontend %>
 (defn build-frontend
@@ -151,10 +150,10 @@
   (let [cljs (resolve 'adzerk.boot-cljs/cljs)
         sass (resolve 'deraen.boot-sass/sass)]
     (comp (with-pass-thru _
-            (util/dbug "Options:\n%s\n" (with-out-str (pprint options))))
+            (util/dbug "[build-frontend] options:\n%s\n" (with-out-str (pprint options))))
           (version-file)
-          (apply sass (flatten (seq (:sass options))))
-          (apply cljs (flatten (seq (:cljs options))))
+          (apply sass (mapcat identity (:sass options)))
+          (apply cljs (mapcat identity (:cljs options)))
           (if-not out-folder?
             (built-in/sift :include #{#"main.out"} :invert true)
             identity))))
@@ -175,13 +174,13 @@
         cljs-build-deps (resolve 'adzerk.boot-cljs/deps)
         sass (resolve 'deraen.boot-sass/sass)
         serve (resolve 'pandeiro.boot-http/serve)]
-    (comp (apply serve (flatten (seq (:serve options))))
+    (comp (apply serve (mapcat identity (:serve options)))
           (built-in/watch)
           (version-file)
-          (apply sass (flatten (seq (:sass options))))
-          (apply reload (flatten (seq (:reload options))))
-          (apply cljs-repl (flatten (seq (:cljs-repl options))))
-          (apply cljs (flatten (seq (:cljs options))))
+          (apply sass (mapcat identity (:sass options)))
+          (apply reload (mapcat identity (:reload options)))
+          (apply cljs-repl (mapcat identity (:cljs-repl options)))
+          (apply cljs (mapcat identity (:cljs options)))
           (if (> @boot.util/*verbosity* 1)
             (built-in/show :fileset true)
             identity))))
@@ -200,10 +199,10 @@
   some namespaces."
   [options]
   (comp (with-pass-thru _
-          (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
+          (util/dbug "[test-frontend] options:\n%s\n" (with-out-str (pprint options)))
           (apply-options! options)
           (require 'crisptrutski.boot-cljs-test))
         (with-pre-wrap fs
           (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)
-                middleware (apply test-cljs (flatten (seq (:test-cljs options))))]
+                middleware (apply test-cljs (mapcat identity (:test-cljs options)))]
             ((middleware identity) fs)))))<% endif %>
