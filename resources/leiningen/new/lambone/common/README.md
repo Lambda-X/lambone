@@ -26,10 +26,12 @@ All of the boot commands accept a `-f|--flavor` and `-t|--type` that defines whi
 `boot dev` will launch:
 
  - A Clojure nRepl on port 5055, the backend server itself exposed on port 3000
-<% if any frontend %> - A ClojureScript Repl on port 5088 (execute `((eval 'adzerk.boot-cljs-repl/start-repl))` and connect to [http://localhost:8000](http://localhost:8000) for seeing `cljs.user`)
+<% if any frontend %> - A ClojureScript Repl on port 5088
 <% endif %>
 You can explore `env/dev/src/dev.clj` for getting acquainted with the system management tools. In there, `(dev/reset)` is the one that gives you the canonical reloaded workflow, featuring [mount](https://github.com/tolitius/mount).
 
+<% if any frontend %>
+There is also an option for using Dirac instead of a regular cljs repl: you first need to follow Dirac's [installation](https://github.com/binaryage/dirac/blob/master/docs/installation.md) instructions, then you can launch `boot dev -d` and open the [Dirac Chrome Extension](https://chrome.google.com/webstore/detail/dirac-devtools/kbkdngfljkchidcjpnfcgcokkbhlkogi) at [http://localhost:8000](http://localhost:8000).<% endif %>
 ### Build
 
 For building the final artifact you need:

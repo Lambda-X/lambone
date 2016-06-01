@@ -50,14 +50,9 @@
                            [adzerk/cljs-console "0.1.1" :exclusions [adzerk/env] :scope "test"]
                            ;; dev only
                            [adzerk/boot-cljs "1.7.228-1" :scope "test"]
-                           [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
                            [adzerk/boot-reload "0.4.4" :scope "test"]
                            [deraen/boot-sass "0.2.1" :scope "test"]
                            [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
-                           [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
-                           [com.cemerick/piggieback "0.2.1" :scope "test"]
-                           [weasel "0.7.0" :scope "test"]
-                           [org.clojure/tools.nrepl "0.2.12" :scope "test"]
                            [org.slf4j/slf4j-nop "1.7.21" :scope "test"]
                            [pandeiro/boot-http "0.7.3" :scope "test"]]))
 <% endif %>
@@ -156,14 +151,14 @@
           :closure-defines {"goog.DEBUG" true}}))
 
 (def frontend-options
-  {:env {:source-paths #{"src/frontend"}
-         :asset-paths #{"assets"}
+  {:env {:source-paths #{"src/frontend" "src/common"}
          :dependencies frontend-deps}
    :reload {:on-jsload '<<project-ns>>.app/init}
    :cljs-repl {:nrepl-opts {:port 5088}}
    :test-cljs {:suite-ns '<<project-ns>>.suite}
    :serve {:dir "assets"
-           :port 8000}})
+           :port 8000}
+   :cljs-devtools {:nrepl-opts {:port 5088}}})
 
 (defmethod boot/options [:frontend :dev]
   [selection]
@@ -236,10 +231,11 @@
   - port 5055 for the backend
   - port 5088 for the frontend (call adzerk.boot-cljs-repl/start-repl and then
   point your browser to http://localhost:3000)."
-  [f flavor VAL kw "The flavor (backend or frontend)"]
+  [f flavor VAL kw   "The flavor (backend or frontend)"
+   d dirac      bool "Enable the Dirac repl instead of the standard one."]
   (boot.util/info "Starting interactive dev...\n")
   (let [<% if any backend %>dev-backend #(boot/dev-backend (boot/options [:backend :dev]))<% endif %><% if any frontend %>
-        dev-frontend #(boot/dev-frontend (boot/options [:frontend :dev]))<% endif %>]
+        dev-frontend #(boot/dev-frontend (boot/options [:frontend :dev]) dirac)<% endif %>]
     (case flavor
       <% if any backend %>:backend (comp (dev-backend) (wait))<% endif %><% if any frontend %>
       :frontend (dev-frontend)<% endif %><% if all backend frontend %>
@@ -284,10 +280,11 @@
   If no -f|--flavor is specified it will be read from BOOT_BUILD_FLAVOR.
   If no -t|--type is specified the task will assume :prod."
   [f flavor VAL kw   "The flavor"
-   t type   VAL kw   "The build type, either prod or dev"]
+   t type   VAL kw   "The build type, either prod or dev"
+   d dirac      bool "Enable the Dirac repl instead of the standard one."]
   (let [type (or type :prod)
         flavor (or flavor (keyword (get (env/env) "BOOT_BUILD_FLAVOR")))]
-    (boot/show-deps (boot/options [flavor type]))))
+    (boot/deps (boot/options [flavor type]) dirac)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  see dev/boot.clj for task customization  ;;

@@ -51,14 +51,34 @@
     (assert (or (nil? props) (map? props)) "Option :props should be a map.")
     (set-system-properties! props)))
 
-(defn show-deps
+(def cljs-repl-deps
+  '[[adzerk/boot-cljs-repl "0.3.0" :scope "test"]
+    [com.cemerick/piggieback "0.2.1" :scope "test"]
+    [weasel "0.7.0" :scope "test"]
+    [org.clojure/tools.nrepl "0.2.12" :scope "test"]])
+
+(def dirac-repl-deps
+  '[[binaryage/devtools "0.6.1" :scope "test"]
+    [binaryage/dirac "0.4.0" :scope "test"]
+    [jupl/boot-cljs-devtools "0.1.1-SNAPSHOT" :scope "test"]])
+
+(defn add-repl-deps
+  [options dirac]
+  (if-not dirac
+    (update-in options [:env :dependencies] into cljs-repl-deps)
+    (update-in options [:env :dependencies] into dirac-repl-deps)))
+
+(defn deps
   "Return a task that shows the dependency tree from the input option
   map."
-  [options]
-  (comp (with-pass-thru _
-          (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
-          (boot/apply-options! options))
-        (built-in/show :deps true)))
+  ([options]
+   (deps options false))
+  ([options dirac]
+   (comp (with-pass-thru _
+           (let [options (add-repl-deps options dirac)]
+             (util/dbug "[deps] options:\n%s\n" (with-out-str (pprint options)))
+             (boot/apply-options! options)))
+         (built-in/show :deps true))))
 
 (defn env->directories
   "Calculate the content of :directories (a set of string) given the
@@ -160,30 +180,37 @@
 
 (defn dev-frontend
   "Start the development interactive environment."
-  [options]
-  (util/dbug "Options:\n%s\n" (with-out-str (pprint options)))
-  (apply-options! options)
-  (require 'adzerk.boot-cljs
-           'adzerk.boot-cljs-repl
-           'deraen.boot-sass
-           'adzerk.boot-reload
-           'pandeiro.boot-http)
-  (let [reload (resolve 'adzerk.boot-reload/reload)
-        cljs-repl (resolve 'adzerk.boot-cljs-repl/cljs-repl)
-        cljs (resolve 'adzerk.boot-cljs/cljs)
-        cljs-build-deps (resolve 'adzerk.boot-cljs/deps)
-        sass (resolve 'deraen.boot-sass/sass)
-        serve (resolve 'pandeiro.boot-http/serve)]
-    (comp (apply serve (mapcat identity (:serve options)))
-          (built-in/watch)
-          (version-file)
-          (apply sass (mapcat identity (:sass options)))
-          (apply reload (mapcat identity (:reload options)))
-          (apply cljs-repl (mapcat identity (:cljs-repl options)))
-          (apply cljs (mapcat identity (:cljs options)))
-          (if (> @boot.util/*verbosity* 1)
-            (built-in/show :fileset true)
-            identity))))
+  ([options]
+   (dev-frontend options false))
+  ([options dirac]
+   (let [options (add-repl-deps options dirac)]
+     (util/dbug "[dev-frontend] options:\n%s\n" (with-out-str (pprint options)))
+     (apply-options! options)
+     (require 'adzerk.boot-cljs
+              (if-not dirac
+                'adzerk.boot-cljs-repl
+                'jupl.boot-cljs-devtools)
+              'deraen.boot-sass
+              'adzerk.boot-reload
+              'pandeiro.boot-http)
+     (let [reload (resolve 'adzerk.boot-reload/reload)
+           cljs (resolve 'adzerk.boot-cljs/cljs)
+           cljs-build-deps (resolve 'adzerk.boot-cljs/deps)
+           sass (resolve 'deraen.boot-sass/sass)
+           serve (resolve 'pandeiro.boot-http/serve)
+           [repl-task repl-options] (if-not dirac
+                                      [(resolve 'adzerk.boot-cljs-repl/cljs-repl) (:cljs-repl options)]
+                                      [(resolve 'jupl.boot-cljs-devtools/cljs-devtools) (:cljs-devtools options)])]
+       (comp (apply serve (mapcat identity (:serve options)))
+             (built-in/watch)
+             (version-file)
+             (apply sass (mapcat identity (:sass options)))
+             (apply reload (mapcat identity (:reload options)))
+             (apply repl-task (mapcat identity repl-options))
+             (apply cljs (mapcat identity (:cljs options)))
+             (if (> @boot.util/*verbosity* 1)
+               (built-in/show :fileset true)
+               identity))))))
 
 (defn boot-cljs-test-opts
   [options namespaces]
