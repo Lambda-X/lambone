@@ -36,7 +36,7 @@ This template does not want by any means compete against Luminus, which the [cur
 * Consistent hooks for taming Java logging and redirect all of it to log4j2
 * Canonical reload workflow and browser refreshing
 * Ready to use test harness (you only need to have PhantomJS on the target machine)
-
+* Switch from a Clojurescript Repl to a Dirac Repl at will (`-d/--dirac` option to the `dev` task)
 
 ## Usage
 
