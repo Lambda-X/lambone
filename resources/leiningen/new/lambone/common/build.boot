@@ -6,7 +6,8 @@
                      [adzerk/env "0.3.0" :scope "test"]
                      [pandeiro/boot-http "0.7.3" :scope "test"]])
 <% if all backend frontend %>
-(def common-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]])
+(def common-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]
+                   [adzerk/env "0.3.0" :scope "test"]])
 
 (def backend-deps (into common-deps
                         '[[org.clojure/tools.namespace "0.2.10"]
@@ -23,8 +24,7 @@
                           [robert/hooke "1.3.0"]
                           [cprop "0.1.7"]
                           ;; dev only
-                          [adzerk/boot-test "1.1.1" :scope "test"]
-                          [adzerk/env "0.3.0" :scope "test"]]))
+                          [adzerk/boot-test "1.1.1" :scope "test"]]))
 <% endif %><% if not all backend frontend %>
 (def backend-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]
                     [org.clojure/tools.namespace "0.2.10"]
@@ -41,14 +41,13 @@
                     [robert/hooke "1.3.0"]
                     [cprop "0.1.7"]
                     ;; dev only
-                    [adzerk/boot-test "1.1.1" :scope "test"]
-                    [adzerk/env "0.3.0" :scope "test"]])
+                    [adzerk/boot-test "1.1.1" :scope "test"]])
 <% endif %><% if any frontend %>
 ;; All the deps are "test" because they are only need for compiling to
 ;; JavaScript, not "real" project dependencies.
 (def frontend-deps (into common-deps
                          '[[org.clojure/clojurescript "1.8.51" :scope "test"]
-                           [adzerk/cljs-console "0.1.1" :scope "test"]
+                           [adzerk/cljs-console "0.1.1" :exclusions [adzerk/env] :scope "test"]
                            ;; dev only
                            [adzerk/boot-cljs "1.7.228-1" :scope "test"]
                            [adzerk/boot-cljs-repl "0.3.0" :scope "test"]
@@ -64,7 +63,7 @@
 <% endif %>
 (set-env! :source-paths #{"dev"}
           :dependencies cmd-line-deps
-          :exclusions '#{org.clojure/clojure})
+          :exclusions '#{org.clojure/clojure com.google.guava/guava})
 
 (require 'boot
          '[clojure.pprint :refer [pprint]]
