@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.2](https://github.com/Lambda-X/lambone/compare/0.1.1...0.1.2)
+
+- Remove clojure.tools.namespace calls from dev.clj
+- Introduce `boot dev --[dirac](https://github.com/binaryage/dirac)` for optionally have a repl in your Chrome DevTools.
+- Get rid of dependency warnings
+
 ## [0.1.1](https://github.com/Lambda-X/lambone/compare/0.1.0...0.1.1)
 
 - Now lambone serves assets in the fronted dev task
