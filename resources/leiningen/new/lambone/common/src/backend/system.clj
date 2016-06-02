@@ -1,11 +1,18 @@
 (ns <<project-ns>>.system
   "The system, aka the core of your app"
-  (:require [mount.core :as mount]
+  (:require [clojure.tools.logging :as log]
+            [mount.core :as mount]
             [cprop.core :as c]
             [clojure.java.io :as io]
             [clojure.string :as str]
-            [<<project-ns>>.env :as env])
+            [<<project-ns>>.env :as env]
+            [<<project-ns>>.logging :as logging])
   (:import java.util.Properties))
+
+(Thread/setDefaultUncaughtExceptionHandler
+ (reify Thread$UncaughtExceptionHandler
+   (uncaughtException [_ thread ex]
+     (log/error ex "Uncaught exception on" (.getName thread)))))
 
 (defn version!
   "Return the current version from the version.properties file."
@@ -35,3 +42,19 @@
 (mount/defstate
   config
   :start (make-config))
+
+(defn stop
+  "Stop the system."
+  []
+  (mount/stop)
+  (logging/without-logging-status)
+  (log/info "<=< Stopped"))
+
+(defn start
+  "Start the system.
+
+  Args are in the form returned by clojure.tools.cli/parse-opts."
+  [args]
+  (logging/with-logging-status)
+  (mount/start-with-args args)
+  (log/info ">=> Started" (greeting config)))

@@ -8,25 +8,6 @@
             [<<project-ns>>.logging :as logging])
   (:gen-class))
 
-(def cli-options
-  "Customize at will"
-  [#_["-p" "--port PORT" "Port number"
-      :parse-fn #(Integer/parseInt %)]])
-
-(defn stop
-  []
-  (mount/stop)
-  (logging/without-logging-status)
-  (log/info "<=< Stopped"))
-
-(defn start
-  [args]
-  (logging/with-logging-status)
-  (-> args
-      (cli/parse-opts cli-options)
-      mount/start-with-args)
-  (log/info ">=> Started" (system/greeting system/config)))
-
 (defn main-stop
   "Hook for -main side-effects on stop.
 
@@ -43,16 +24,16 @@
   all the side effects that need to be avoided when working at the
   repl."
   [f & args]
-  (.addShutdownHook (Runtime/getRuntime) (Thread. stop))
+  (.addShutdownHook (Runtime/getRuntime) (Thread. #(system/stop)))
   (apply f args))
 
-(Thread/setDefaultUncaughtExceptionHandler
- (reify Thread$UncaughtExceptionHandler
-   (uncaughtException [_ thread ex]
-     (log/error ex "Uncaught exception on" (.getName thread)))))
+(def cli-options
+  "Customize at will"
+  [#_["-p" "--port PORT" "Port number"
+      :parse-fn #(Integer/parseInt %)]])
 
 (defn -main
   [& args]
-  (hooke/add-hook #'<<project-ns>>.core/stop #'<<project-ns>>.core/main-stop)
-  (hooke/add-hook #'<<project-ns>>.core/start #'<<project-ns>>.core/main-start)
-  (start args))
+  (hooke/add-hook #'<<project-ns>>.system/stop #'<<project-ns>>.core/main-stop)
+  (hooke/add-hook #'<<project-ns>>.system/start #'<<project-ns>>.core/main-start)
+  (system/start (cli/parse-opts cli-options)))

@@ -23,9 +23,9 @@
   []
   (pprint (mount-graph/states-with-deps)))
 
-(def start #(core/start nil)) ;; no args to start
+(def start #(system/start nil)) ;; no args to start
 
-(def stop core/stop)
+(def stop system/stop)
 
 (defn go []
   (start)
