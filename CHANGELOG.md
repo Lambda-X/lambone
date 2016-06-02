@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.3](https://github.com/Lambda-X/lambone/compare/0.1.2...0.1.3)
+
+- Wire up version printing in the frontend
+- Fix reset not found bug
+- Move start/stop to system for backend
+
 ## [0.1.2](https://github.com/Lambda-X/lambone/compare/0.1.1...0.1.2)
 
 - Remove clojure.tools.namespace calls from dev.clj
