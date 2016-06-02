@@ -2,4 +2,5 @@
 
 (def ^{:doc "The default clj/cljs environment"}
   defaults
-  {:greeting "Project <<name|title>> (TEST)"})
+  {:greeting "Project <<name|title>> (TEST)"
+   :version-path "/version.properties"})

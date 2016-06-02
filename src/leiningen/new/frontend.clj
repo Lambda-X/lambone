@@ -4,7 +4,8 @@
 
 (def my-assets
   [["src/frontend/{{sanitized}}/app.cljs" "common/src/frontend/app.cljs"]
-
+   ["src/frontend/{{sanitized}}/io.cljs" "common/src/frontend/io.cljs"]
+   
    ;; html/css/sass stuff
    ["assets/greg.svg" "common/assets/greg.svg"]
    ["assets/index.html" "common/assets/index.html"]

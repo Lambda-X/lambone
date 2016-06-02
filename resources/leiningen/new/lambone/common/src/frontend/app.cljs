@@ -1,7 +1,10 @@
 (ns <<project-ns>>.app
-  (:require [adzerk.cljs-console :as log :include-macros true]))
+  (:require [adzerk.cljs-console :as log :include-macros true]
+            [<<project-ns>>.env :as env]
+            [<<project-ns>>.io :as io]))
 
 (enable-console-print!)
 
 (defn init []
-  (log/info "Welcome to <<name|title>>!"))
+  (io/print-version! (:version-path env/defaults))
+  (log/info "Welcome to ~(:greeting env/defaults)"))
