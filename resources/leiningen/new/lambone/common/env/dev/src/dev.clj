@@ -34,6 +34,3 @@
 (defn test-all []
   (run-all-tests #"<<name>>.*test$"))
 
-(defn reset-and-test []
-  (reset)
-  (time (test-all)))
