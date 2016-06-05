@@ -59,7 +59,7 @@
 
 (def dirac-repl-deps
   '[[binaryage/devtools "0.6.1" :scope "test"]
-    [binaryage/dirac "0.4.0" :scope "test"]
+    [binaryage/dirac "0.6.0" :scope "test"]
     [jupl/boot-cljs-devtools "0.1.1-SNAPSHOT" :scope "test"]])
 
 (defn add-repl-deps
