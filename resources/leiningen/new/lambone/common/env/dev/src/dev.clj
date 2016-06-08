@@ -1,5 +1,6 @@
 (ns dev
-  (:require [clojure.pprint :refer [pprint]]
+  (:require boot
+            [clojure.pprint :refer [pprint]]
             [clojure.test :refer [run-all-tests]]
             [clojure.reflect :refer [reflect]]
             [clojure.repl :refer [apropos dir doc find-doc pst source]]
@@ -34,3 +35,10 @@
 (defn test-all []
   (run-all-tests #"<<name>>.*test$"))
 
+;; Deps
+
+(def ^{:doc "Load a dependency on the classpath.
+
+  It expects a (quoted) dependency vector (e.g. '[cheshire \"5.6.1\"]). It then
+  resolves the corresponding jar, downloading it in case, and adds it to the
+  classpath, ready to use." } hotload boot/hotload!)

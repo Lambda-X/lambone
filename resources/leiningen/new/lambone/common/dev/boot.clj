@@ -25,6 +25,19 @@
   respectively."
   identity)
 
+(defn hotload!
+  "Load a dependency on the classpath.
+
+  It expects a (quoted) dependency vector (e.g. '[cheshire
+  \"5.6.1\"]). It then resolves the corresponding jar, downloading it in
+  case, and adds it to the classpath, ready to use."
+  [& coords]
+  (if pod/this-pod
+    (let [dep-maps (pod/resolve-dependency-jars {:dependencies (vec coords)}
+                                                :ignore-clj? true)]
+      (run! pod/add-classpath dep-maps))
+    (util/warn "Cannot hotload, not in a pod.")))
+
 (deftask version-file
   "A task that includes the version.properties file in the fileset."
   []

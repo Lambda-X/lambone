@@ -24,6 +24,8 @@
                           [robert/hooke "1.3.0"]
                           [cprop "0.1.7"]
                           ;; dev only
+                          [boot/core "2.6.0" :scope "test"]
+                          [boot/pod "2.6.0" :scope "test"]
                           [adzerk/boot-test "1.1.1" :scope "test"]]))
 <% endif %><% if not all backend frontend %>
 (def backend-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]
@@ -41,6 +43,8 @@
                     [robert/hooke "1.3.0"]
                     [cprop "0.1.7"]
                     ;; dev only
+                    [boot/core "2.6.0" :scope "test"]
+                    [boot/pod "2.6.0" :scope "test"]
                     [adzerk/boot-test "1.1.1" :scope "test"]])
 <% endif %><% if any frontend %>
 ;; All the deps are "test" because they are only need for compiling to
@@ -103,7 +107,7 @@
 (defmethod boot/options [:backend :dev]
   [selection]
   (-> backend-options
-      (update-in [:env :source-paths] conj "env/dev/src")
+      (update-in [:env :source-paths] conj "env/dev/src" "dev")
       (assoc-in [:env :resource-paths] #{"env/dev/resources"})
       (assoc-in [:env :middleware] @@(resolve 'boot.repl/*default-middleware*))))
 
