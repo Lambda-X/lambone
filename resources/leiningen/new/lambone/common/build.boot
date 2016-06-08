@@ -50,7 +50,7 @@
                            [adzerk/cljs-console "0.1.1" :exclusions [adzerk/env] :scope "test"]
                            ;; dev only
                            [adzerk/boot-cljs "1.7.228-1" :scope "test"]
-                           [adzerk/boot-reload "0.4.4" :scope "test"]
+                           [adzerk/boot-reload "0.4.8" :scope "test"]
                            [deraen/boot-sass "0.2.1" :scope "test"]
                            [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
                            [org.slf4j/slf4j-nop "1.7.21" :scope "test"]
