@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.4](https://github.com/Lambda-X/lambone/compare/0.1.3...0.1.4)
+
+- Add log4j2.xml for test as well
+- Bump boot-reload to avoid an error
+- Bump Dirac
+
 ## [0.1.3](https://github.com/Lambda-X/lambone/compare/0.1.2...0.1.3)
 
 - Wire up version printing in the frontend
