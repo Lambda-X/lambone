@@ -69,7 +69,7 @@
          '[clojure.string :as string]
          '[boot.pod :as pod]
          '[boot.util :as util]
-         '[boot-semver.core :refer [get-version]]
+         '[boot-semver.core :refer :all]
          '[pandeiro.boot-http :refer [serve]]
          '[adzerk.env :as env])
 
