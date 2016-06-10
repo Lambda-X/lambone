@@ -2,7 +2,7 @@
 ;;;  Dependencies  ;;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-(def cmd-line-deps '[[degree9/boot-semver "1.2.4" :scope "test"]
+(def cmd-line-deps '[[degree9/boot-semver "1.2.4" :scope "test" :exclusions [boot/core]]
                      [adzerk/env "0.3.0" :scope "test"]
                      [pandeiro/boot-http "0.7.3" :scope "test"]])
 <% if all backend frontend %>
