@@ -100,6 +100,24 @@
   (reduce #(into %1 (get env %2))
           #{}
           [:source-paths :resource-paths :asset-paths]))
+
+;; From danielsz/system
+;; https://github.com/danielsz/system/blob/master/src/system/boot.clj
+(deftask run
+  "Run the -main function in some namespace with arguments
+
+  If no -t|--type is specified the task will assume :prod."
+  [m main-ns   NAMESPACE sym   "The namespace containing a -main function to invoke."
+   a arguments EXPR      [str] "An optional argument sequence to apply to the -main function."
+   t type      VAL       kw    "The build type, either prod or dev"]
+  (let [options (options [:backend (or type :prod)])]
+    (util/dbug "[run] options:\n%s\n" (with-out-str (pprint options)))
+    (apply-options! options)
+    (with-pass-thru _
+      (require main-ns :reload)
+      (if-let [f (ns-resolve main-ns '-main)]
+        (apply f arguments)
+        (throw (ex-info "No -main method found" {:main-ns main-ns}))))))
 <% if any backend %>
 (defn build-backend
   "Return a boot task for building the backend.

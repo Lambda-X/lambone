@@ -64,7 +64,7 @@
           :dependencies cmd-line-deps
           :exclusions '#{org.clojure/clojure com.google.guava/guava})
 
-(require 'boot
+(require '[boot :refer [run]]
          '[clojure.pprint :refer [pprint]]
          '[clojure.string :as string]
          '[boot.pod :as pod]
@@ -79,7 +79,8 @@
                     :version +version+
                     :url "http://example.com/FIXME"
                     :description "FIXME: write description"
-                    :license {}})
+                    :license {}}
+               run {:main-ns '<<project-ns>>.core})
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Environment   ;;;
