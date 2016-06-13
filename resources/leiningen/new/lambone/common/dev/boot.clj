@@ -233,8 +233,8 @@
                                       [(resolve 'adzerk.boot-cljs-repl/cljs-repl) (:cljs-repl options)]
                                       [(resolve 'jupl.boot-cljs-devtools/cljs-devtools) (:cljs-devtools options)])]
        (comp (apply serve (mapcat identity (:serve options)))
-             (built-in/watch)
              (version-file)
+             (built-in/watch)
              (apply sass (mapcat identity (:sass options)))
              (apply reload (mapcat identity (:reload options)))
              (apply repl-task (mapcat identity repl-options))
