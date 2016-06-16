@@ -178,16 +178,13 @@
     exclusions (assoc-in [:test :exclusions] exclusions)))
 
 (defn test-backend
-  "Run tests once for the backend (uses clojure.test)."
+  "Run backend tests once."
   [options]
-  (comp (with-pass-thru _
-          (util/dbug "[test-backend] options:\n%s\n" (with-out-str (pprint options)))
-          (apply-options! options)
-          (require 'adzerk.boot-test))
-        (with-pre-wrap fs
-          (let [test (resolve 'adzerk.boot-test/test)
-                middleware (apply test (mapcat identity (:test options)))]
-            ((middleware identity) fs)))))<% endif %>
+  (util/dbug "[test-backend] options:\n%s\n" (with-out-str (pprint options)))
+  (apply-options! options)
+  (require 'adzerk.boot-test)
+  (let [test (resolve 'adzerk.boot-test/test)]
+    (comp (apply test (mapcat identity (:test options))))))<% endif %>
 <% if any frontend %>
 (defn build-frontend
   "Return a boot task for building the frontend.
@@ -250,17 +247,10 @@
                    (assoc-in [:test-cljs :namespaces] namespaces))))
 
 (defn test-frontend
-  "Run tests once.
-
-  If no type is passed in, it tests against the production build. It
-  optionally accepts (a set of) symbols that are used for testing only
-  some namespaces."
+  "Run frontend tests once."
   [options]
-  (comp (with-pass-thru _
-          (util/dbug "[test-frontend] options:\n%s\n" (with-out-str (pprint options)))
-          (apply-options! options)
-          (require 'crisptrutski.boot-cljs-test))
-        (with-pre-wrap fs
-          (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)
-                middleware (apply test-cljs (mapcat identity (:test-cljs options)))]
-            ((middleware identity) fs)))))<% endif %>
+  (util/dbug "[test-frontend] options:\n%s\n" (with-out-str (pprint options)))
+  (apply-options! options)
+  (require 'crisptrutski.boot-cljs-test)
+  (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)]
+    (comp (apply test-cljs (mapcat identity (:test-cljs options))))))<% endif %>
