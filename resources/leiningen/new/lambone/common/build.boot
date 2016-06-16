@@ -90,7 +90,7 @@
 ;; and adopt the syntax for cprop: https://github.com/tolitius/cprop#system-properties-cprop-syntax
 
 (env/def
-  BOOT_BUILD_FLAVOR <% if all backend frontend%>nil<% endif%><% if any backend %>"backend"<% endif%>)
+  BOOT_DEFAULT_FLAVOR "backend")
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;  BACKEND OPTIONS  ;;
@@ -210,7 +210,7 @@
   In order to allow task chaining (\"boot build deploy\" at the cmd line for
   instance), building all flavors at the same time is not supported at the
   moment. This means that the build task requires a --flavor and if missing it
-  will read it from BOOT_BUILD_FLAVOR.
+  will read it from BOOT_DEFAULT_FLAVOR.
 
   Optionally you can specify a build type (dev or prod are supported out of
   the box). If no type is passed in, prod will be build.
@@ -221,13 +221,13 @@
    t type   VAL kw   "The build type, either prod or dev"
    o out-folder bool "Include main.out folder."]
   (let [type (or type :prod)
-        flavor (or flavor (keyword (get (env/env) "BOOT_BUILD_FLAVOR")))
-        options (boot/options [flavor type])]
+        flavor (or flavor (keyword (get (env/env) "BOOT_DEFAULT_FLAVOR")))]
+    (assert flavor "Cannot build without a flavor. Either specify it with -f/--flavor or set BOOT_DEFAULT_FLAVOR")
     (util/info "Will build the [%1s %2s] profile...\n" flavor type)
-    (case flavor
-      <% if any backend %>:backend (boot/build-backend options)<% endif %><% if any frontend %>
-      :frontend (boot/build-frontend options out-folder)<% endif %>
-      (throw (ex-info "Cannot build without a flavor. Either specify it with -f/--flavor or set BOOT_BUILD_FLAVOR" {:flavor flavor :type type})))))
+    (let [options (boot/options [flavor type])]
+      (case flavor
+        <% if any backend %>:backend (boot/build-backend options)<% endif %><% if any frontend %>
+        :frontend (boot/build-frontend options out-folder)<% endif %>))))
 
 (deftask dev
   "Start the development interactive environment.
@@ -267,28 +267,29 @@
   [f flavor     VAL        kw        "The flavor"
    n namespace  NS         #{sym}   "Override and test only this namespace"
    e exclusion  REGEX      #{sym}   "Exclude this namespace"]
-  (let [<% if any backend %>test-backend #(-> (boot/options [:backend :test])
-                          (boot/boot-test-opts namespace exclusion)
-                          boot/test-backend)<% endif %><% if any frontend %>
-        test-frontend #(-> (boot/options [:frontend :test])
-                           (boot/boot-cljs-test-opts namespace)
-                           boot/test-frontend)<% endif %>]
-    (case flavor
-      <% if any backend %>:backend (test-backend)<% endif %>
-      <% if any frontend %>:frontend (test-frontend)<% endif %><% if all backend frontend %>
-      (comp (test-backend)
-            (test-frontend)))))<% endif %><% if not all backend frontend %>(test-backend))))<% endif %>
+  (let [flavor (or flavor (keyword (get (env/env) "BOOT_DEFAULT_FLAVOR")))]
+    (assert flavor "Cannot build without a flavor. Either specify it with -f/--flavor or set BOOT_DEFAULT_FLAVOR")
+    (letfn [<% if any backend %>(test-backend [] (-> (boot/options [:backend :test])
+                                 (boot/boot-test-opts namespace exclusion)
+                                 boot/test-backend))<% endif %><% if any frontend %>
+            (test-frontend [] (-> (boot/options [:frontend :test])
+                                  (boot/boot-cljs-test-opts namespace)
+                                  boot/test-frontend))<% endif %>]
+      (case flavor
+        <% if any backend %>:backend (test-backend)<% endif %><% if any frontend %>
+        :frontend (test-frontend)<% endif %>))))
 
 (deftask deps
   "Show the dependency tree
 
-  If no -f|--flavor is specified it will be read from BOOT_BUILD_FLAVOR.
+  If no -f|--flavor is specified it will be read from BOOT_DEFAULT_FLAVOR.
   If no -t|--type is specified the task will assume :prod."
   [f flavor VAL kw   "The flavor"
    t type   VAL kw   "The build type, either prod or dev"
    d dirac      bool "Enable the Dirac repl instead of the standard one."]
   (let [type (or type :prod)
-        flavor (or flavor (keyword (get (env/env) "BOOT_BUILD_FLAVOR")))]
+        flavor (or flavor (keyword (get (env/env) "BOOT_DEFAULT_FLAVOR")))]
+    (assert flavor "Cannot list dependencies without a flavor. Either specify it with -f/--flavor or set BOOT_DEFAULT_FLAVOR")
     (boot/deps (boot/options [flavor type]) dirac)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
