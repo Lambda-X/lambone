@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.5](https://github.com/Lambda-X/lambone/compare/0.1.4...0.1.5)
+
+- [*Breaking*] Change BOOT_BUILD_FLAVOR to BOOT_DEFAULT_FLAVOR and use it in `deps` and `test` tasks
+- Fix missing `adzerk.env` dependency when backend only
+- Add `hotload` dependency loading utility in the `dev` namespace
+- Add `run` task
+- Fix (version-file) called inside the `watch` task in frontend
+- Bump `cljs-devtools` to latest
+- Add some minimal boilerplate for -main argument handling
+- Refer all the `boot-semver` symbols (alpha, snapshot, ...are available from the command line)
+
 ## [0.1.4](https://github.com/Lambda-X/lambone/compare/0.1.3...0.1.4)
 
 - Add log4j2.xml for test as well
