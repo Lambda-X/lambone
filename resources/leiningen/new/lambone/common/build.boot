@@ -45,7 +45,8 @@
                     ;; dev only
                     [boot/core "2.6.0" :scope "test"]
                     [boot/pod "2.6.0" :scope "test"]
-                    [adzerk/boot-test "1.1.1" :scope "test"]])
+                    [adzerk/boot-test "1.1.1" :scope "test"]
+                    [adzerk/env "0.3.0" :scope "test"]])
 <% endif %><% if any frontend %>
 ;; All the deps are "test" because they are only need for compiling to
 ;; JavaScript, not "real" project dependencies.
