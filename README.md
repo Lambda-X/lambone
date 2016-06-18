@@ -22,7 +22,7 @@ It is bare in the sense that it does not include anything more than:
 * Frontend
  * [clojurescript](https://github.com/clojure/clojurescript)
  * [cljs-console](https://github.com/adzerk-oss/cljs-console)
- * [sass4clj](https://github.com/Deraen/sass4clj)
+ * [boot-sass](https://github.com/Deraen/boot-sass)
  * [dirac](https://github.com/binaryage/dirac)
 
 Why would you want to use `lambone` then?
