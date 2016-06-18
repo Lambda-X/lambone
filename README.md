@@ -27,15 +27,18 @@ It is bare in the sense that it does not include anything more than:
 
 Why would you want to use `lambone` then?
 
-This template does not want by any means compete against Luminus, which the [current maintainer](https://github.com/arichiardi) is actually trying to [enhance](https://github.com/luminus-framework/luminus-template/issues/223) with boot support, but it does provide a couple of neat features that you can setup by yourself but are a bit cumbersome to remember every time you bootstrap a project:
+This template does not want by any means to compete against Luminus, which the [current maintainer](https://github.com/arichiardi) is actually trying to [enhance](https://github.com/luminus-framework/luminus-template/issues/223) with boot support, but it does provide a couple of neat features that you can setup by yourself but are a bit cumbersome to remember every time you bootstrap a project:
 
 * Three ready to use `boot build`, `boot dev` and `boot test` tasks
-* `boot dev` with no options potentially launches two Repl instances within the same JVM
+* `boot dev` with no option launches two Repl instances within the same JVM
 * Easy to configure, flavor-like `boot` task configuration through multi-methods and `-f|--flavor` option
 * Consistent hooks for taming Java logging and redirect all of it to log4j2
 * Canonical reload workflow and browser refreshing
 * Ready to use test harness (you only need to have PhantomJS on the target machine)
 * Switch from a Clojurescript Repl to a [Dirac](https://github.com/binaryage/dirac) Repl at will (`-d/--dirac` option to the `dev` task)
+* Dependency hotload (backend only at the moment)
+
+Don't skip reading the README once the project has been created to know more.
 
 ## Usage
 
