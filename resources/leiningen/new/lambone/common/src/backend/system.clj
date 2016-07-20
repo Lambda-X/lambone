@@ -36,8 +36,8 @@
 (defn make-config
   "Creates a default configuration map"
   []
-  (-> (c/load-config :merge [env/defaults
-                             {:version (if-let [version (version!)] version "0.0.0")}])))
+  (c/load-config :merge [env/defaults
+                         {:version (if-let [version (version!)] version "0.0.0")}]))
 
 (mount/defstate
   config
