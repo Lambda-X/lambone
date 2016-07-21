@@ -22,7 +22,7 @@
                           [org.apache.logging.log4j/log4j-slf4j-impl "2.5" :scope "runtime"]
                           [mount "0.1.10"]
                           [robert/hooke "1.3.0"]
-                          [cprop "0.1.7"]
+                          [cprop "0.1.8"]
                           ;; dev only
                           [boot/core "2.6.0" :scope "test"]
                           [boot/pod "2.6.0" :scope "test"]
@@ -41,7 +41,7 @@
                     [org.apache.logging.log4j/log4j-slf4j-impl "2.5" :scope "runtime"]
                     [mount "0.1.10"]
                     [robert/hooke "1.3.0"]
-                    [cprop "0.1.7"]
+                    [cprop "0.1.8"]
                     ;; dev only
                     [boot/core "2.6.0" :scope "test"]
                     [boot/pod "2.6.0" :scope "test"]

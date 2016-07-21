@@ -69,7 +69,7 @@ In case of backend *and* frontend, `boot build` does not actually build both cau
 Logging is based on [clojure.tools.logging](https://github.com/clojure/tools.logging) and [Apache Log4j 2](https://logging.apache.org/log4j/2.x/).
 If you need to control the configuration from a custom file you can launch the executable with:
 
-`java -Dlog4j.configurationFile "your log4j2.xml path" -cp <<project-ns>>-standalone.jar <<project-ns>>.core`
+`java -Dlog4j.configurationFile "your log4j2.xml path" -jar <<project-ns>>-standalone.jar <<project-ns>>.core`
 
 Otherwise the provided configuration file is `env/prod|dev|test/resources/log4j2.xml`.
 
@@ -85,8 +85,20 @@ The config files are in `env/dev/resources/config.edn` (mainly server-side) and 
  ...}
 ```
 
-Note that `cprop` will merge environment variables and system properties if and only if they are already present in `config.edn` or `env.cljc` with the right nesting *and* syntax.
 
+An additional file is automatically merged: the file found at the location set using the `conf` system property. For instance, to merge a `external-config.edn` file, call your jar with:
+
+`java -Dconf="../somepath/external-config.edn" -jar <<project-ns>>-standalone.jar <<project-ns>>.core`
+
+This works in `profile.boot` as well:
+
+```
+(env/def
+  conf "../somepath/external-config.edn"
+  ...)
+```
+
+*Note:* `cprop` will merge environment variables and system properties if and only if they are already present in `config.edn` or `env.cljc` with the right nesting *and* syntax.
 <% if any frontend %>
 #### Serve files
 
