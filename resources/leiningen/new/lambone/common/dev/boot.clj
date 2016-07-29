@@ -184,7 +184,7 @@
   (apply-options! options)
   (require 'adzerk.boot-test)
   (let [test (resolve 'adzerk.boot-test/test)]
-    (comp (apply test (mapcat identity (:test options))))))<% endif %>
+    (apply test (mapcat identity (:test options)))))<% endif %>
 <% if any frontend %>
 (defn build-frontend
   "Return a boot task for building the frontend.
@@ -253,4 +253,4 @@
   (apply-options! options)
   (require 'crisptrutski.boot-cljs-test)
   (let [test-cljs (resolve 'crisptrutski.boot-cljs-test/test-cljs)]
-    (comp (apply test-cljs (mapcat identity (:test-cljs options))))))<% endif %>
+    (apply test-cljs (mapcat identity (:test-cljs options)))))<% endif %>
