@@ -71,9 +71,9 @@
     [org.clojure/tools.nrepl "0.2.12" :scope "test"]])
 
 (def dirac-repl-deps
-  '[[binaryage/devtools "0.7.0" :scope "test"]
-    [binaryage/dirac "0.6.0" :scope "test"]
-    [jupl/boot-cljs-devtools "0.1.1-SNAPSHOT" :scope "test"]])
+  '[[binaryage/devtools "0.7.2" :scope "test"]
+    [binaryage/dirac "0.6.2" :scope "test"]
+    [powerlaces/boot-cljs-devtools "0.1.1-SNAPSHOT" :scope "test"]])
 
 (defn add-repl-deps
   [options dirac]
@@ -217,7 +217,7 @@
      (require 'adzerk.boot-cljs
               (if-not dirac
                 'adzerk.boot-cljs-repl
-                'jupl.boot-cljs-devtools)
+                'powerlaces.boot-cljs-devtools)
               'deraen.boot-sass
               'adzerk.boot-reload
               'pandeiro.boot-http)
@@ -228,7 +228,7 @@
            serve (resolve 'pandeiro.boot-http/serve)
            [repl-task repl-options] (if-not dirac
                                       [(resolve 'adzerk.boot-cljs-repl/cljs-repl) (:cljs-repl options)]
-                                      [(resolve 'jupl.boot-cljs-devtools/cljs-devtools) (:cljs-devtools options)])]
+                                      [(resolve 'powerlaces.boot-cljs-devtools/cljs-devtools) (:cljs-devtools options)])]
        (comp (apply serve (mapcat identity (:serve options)))
              (version-file)
              (built-in/watch)
