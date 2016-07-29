@@ -29,7 +29,7 @@
                           [adzerk/boot-test "1.1.1" :scope "test"]]))
 <% endif %><% if not all backend frontend %>
 (def backend-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]
-                    [org.clojure/tools.namespace "0.2.10"]
+                    [org.clojure/tools.namespace "0.3.0-alpha3"]
                     [org.clojure/tools.reader "0.10.0"]
                     [org.clojure/tools.cli "0.3.3"]
                     [org.clojure/tools.logging "0.3.1"]
@@ -51,11 +51,11 @@
 ;; All the deps are "test" because they are only need for compiling to
 ;; JavaScript, not "real" project dependencies.
 (def frontend-deps (into common-deps
-                         '[[org.clojure/clojurescript "1.8.51" :scope "test"]
-                           [adzerk/cljs-console "0.1.1" :exclusions [adzerk/env] :scope "test"]
+                         '[[org.clojure/clojurescript "1.9.76" :scope "test"]
+                           [adzerk/cljs-console "0.1.1" :scope "test" :exclusions [adzerk/env]]
                            ;; dev only
                            [adzerk/boot-cljs "1.7.228-1" :scope "test"]
-                           [adzerk/boot-reload "0.4.9" :scope "test"]
+                           [adzerk/boot-reload "0.4.12" :scope "test"]
                            [deraen/boot-sass "0.2.1" :scope "test"]
                            [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
                            [org.slf4j/slf4j-nop "1.7.21" :scope "test"]
