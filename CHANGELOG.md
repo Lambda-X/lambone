@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.6](https://github.com/Lambda-X/lambone/compare/0.1.5...0.1.6)
+
+- Bump ClojureScript to 1.9.76
+- Bump `dirac` and `cljs-devtools` to latest and working versions
+- Add log4j2 coloring
+
 ## [0.1.5](https://github.com/Lambda-X/lambone/compare/0.1.4...0.1.5)
 
 - [*Breaking*] Change BOOT_BUILD_FLAVOR to BOOT_DEFAULT_FLAVOR and use it in `deps` and `test` tasks
