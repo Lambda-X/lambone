@@ -158,6 +158,7 @@
 
 (def frontend-options
   {:env {:source-paths #{"src/frontend" "src/common"}
+         :asset-paths #{"assets"}
          :dependencies frontend-deps}
    :reload {:on-jsload '<<project-ns>>.app/init}
    :cljs-repl {:nrepl-opts {:port 5088}}
