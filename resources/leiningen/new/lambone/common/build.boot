@@ -229,7 +229,7 @@
     (let [options (boot/options [flavor type])]
       (case flavor
         <% if any backend %>:backend (boot/build-backend options)<% endif %><% if any frontend %>
-        :frontend (boot/build-frontend options out-folder)<% endif %>))))
+        :frontend (boot/build-frontend options (or out-folder (not= type :prod)))<% endif %>))))
 
 (deftask dev
   "Start the development interactive environment.
