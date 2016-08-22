@@ -239,7 +239,7 @@
   - port 5088 for the frontend (call adzerk.boot-cljs-repl/start-repl and then
   point your browser to http://localhost:3000)."
   [f flavor VAL kw   "The flavor (backend or frontend)"
-   d dirac      bool "Enable the Dirac repl instead of the standard one."]
+   D dirac      bool "Enable the Dirac repl instead of the standard one."]
   (boot.util/info "Starting interactive dev...\n")
   (let [<% if any backend %>dev-backend #(boot/dev-backend (boot/options [:backend :dev]))<% endif %><% if any frontend %>
         dev-frontend #(boot/dev-frontend (boot/options [:frontend :dev]) dirac)<% endif %>]
@@ -288,7 +288,7 @@
   If no -t|--type is specified the task will assume :prod."
   [f flavor VAL kw   "The flavor"
    t type   VAL kw   "The build type, either prod or dev"
-   d dirac      bool "Enable the Dirac repl instead of the standard one."]
+   D dirac      bool "Enable the Dirac repl instead of the standard one."]
   (let [type (or type :prod)
         flavor (or flavor (keyword (get (env/env) "BOOT_DEFAULT_FLAVOR")))]
     (assert flavor "Cannot list dependencies without a flavor. Either specify it with -f/--flavor or set BOOT_DEFAULT_FLAVOR")
