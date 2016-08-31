@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.7](https://github.com/Lambda-X/lambone/compare/0.1.6...0.1.7)
+
+- [*Breaking*] Change the `dirac` switch to `-D` (conflicting for the built-in `show -d`)
+- Fix for bug when trying to override `env/defaults` with the `conf` system property
+- Never exclude the `main.out` folder in development builds
+- Add missing `assets` folder to `frontend-options`
+- Bump ClojureScript to 1.9.227
+- Add `utils` namespace for both frontend and backend
+- Improve `dev/test-all`
+
+
 ## [0.1.6](https://github.com/Lambda-X/lambone/compare/0.1.5...0.1.6)
 
 - Bump ClojureScript to 1.9.76

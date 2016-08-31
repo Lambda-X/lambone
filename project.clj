@@ -1,4 +1,4 @@
-(defproject lambone/lein-template "0.1.6"
+(defproject lambone/lein-template "0.1.7"
   :description "Bare-bones boot + backend & frontend project template"
   :url "https://github.com/Lambda-X/lambone"
   :license {:name "Eclipse Public License"
