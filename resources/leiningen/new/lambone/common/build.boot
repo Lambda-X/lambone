@@ -2,9 +2,9 @@
 ;;;  Dependencies  ;;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-(def cmd-line-deps '[[degree9/boot-semver "1.2.4" :scope "test" :exclusions [boot/core]]
+(def cmd-line-deps '[[degree9/boot-semver "1.3.5" :scope "test" :exclusions [org.clojure/clojure com.google.guava/guava]]
                      [adzerk/env "0.3.0" :scope "test"]
-                     [pandeiro/boot-http "0.7.3" :scope "test"]])
+                     [pandeiro/boot-http "0.7.3" :scope "test" :exclusions [org.clojure/clojure]]])
 <% if all backend frontend %>
 (def common-deps '[[org.clojure/clojure "1.8.0" :scope "provided"]
                    [adzerk/env "0.3.0" :scope "test"]])
@@ -61,9 +61,10 @@
                            [org.slf4j/slf4j-nop "1.7.21" :scope "test"]
                            [pandeiro/boot-http "0.7.3" :scope "test"]]))
 <% endif %>
+(def backend-exclusions '#{org.clojure/clojurescript})
+
 (set-env! :source-paths #{"dev"}
-          :dependencies cmd-line-deps
-          :exclusions '#{org.clojure/clojure com.google.guava/guava})
+          :dependencies cmd-line-deps)
 
 (require '[boot :refer [run]]
          '[clojure.pprint :refer [pprint]]
@@ -99,6 +100,7 @@
 
 (def backend-options
   {:env {:dependencies backend-deps
+         :exclusions backend-exclusions
          :source-paths #{"src/backend" "src/common"}}
    :repl {:init-ns 'dev
           :port 5055}
