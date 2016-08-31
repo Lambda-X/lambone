@@ -1,13 +1,13 @@
 (ns dev
   (:require boot
             [clojure.pprint :refer [pprint]]
-            [clojure.test :refer [run-all-tests]]
+            [clojure.test :as test]
             [clojure.reflect :refer [reflect]]
             [clojure.repl :refer [apropos dir doc find-doc pst source]]
-            [clojure.tools.namespace.repl :as tnr]
+            [clojure.tools.namespace.find :as tnfind]
+            [clojure.java.classpath :as jcpath]
             [clojure.java.io :as io]
-            [mount.core :as mount :refer [start-without start-with start-with-states
-                                          stop-except only except swap swap-states with-args]]
+            [mount.core :as mount]
             [mount.tools.graph :as mount-graph]
             [clojure.tools.logging :as log :refer [spy spyf]]
             [adzerk.env :refer [env]]
@@ -33,7 +33,11 @@
   :ready)
 
 (defn test-all []
-  (run-all-tests #"<<name>>.*test$"))
+  (let [test-namespaces (->> (jcpath/classpath-directories)
+                             (tnfind/find-namespaces)
+                             (filter #(re-find #"booma.*-test$" (str %))))]
+    (run! require test-namespaces)
+    (apply test/run-tests test-namespaces)))
 
 ;; Deps
 
