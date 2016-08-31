@@ -124,7 +124,8 @@
   (-> backend-options
       (update-in [:env :source-paths] conj "test/backend" "env/dev/src")
       (assoc-in [:env :resource-paths] #{"env/test/resources"})
-      (assoc-in [:test :namespaces] #{'<<project-ns>>.system-test})))
+      (assoc-in [:test :namespaces] #{'<<project-ns>>.system-test
+                                      '<<project-ns>>.utils-test})))
 <% if any frontend %>
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  FRONTEND OPTIONS  ;;

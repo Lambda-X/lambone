@@ -24,12 +24,15 @@
    ["env/test/src/{{sanitized}}/env.cljc" "common/env/test/src/env.cljc"]
 
    ["src/common/{{sanitized}}/api.cljc" "common/src/common/api.cljc"]
+
    ["src/backend/{{sanitized}}/core.clj" "common/src/backend/core.clj"]
    ["src/backend/{{sanitized}}/system.clj" "common/src/backend/system.clj"]
    ["src/backend/{{sanitized}}/logging.clj" "common/src/backend/logging.clj"]
+   ["src/backend/{{sanitized}}/utils.clj" "common/src/backend/utils.clj"]
 
    ;; tests
-   ["test/backend/{{sanitized}}/system_test.clj" "common/test/backend/system_test.clj"]])
+   ["test/backend/{{sanitized}}/system_test.clj" "common/test/backend/system_test.clj"]
+   ["test/backend/{{sanitized}}/utils_test.clj" "common/test/backend/utils_test.clj"]])
 
 (defn features
   "Return a vector [assets options] with added stuff if necessary."

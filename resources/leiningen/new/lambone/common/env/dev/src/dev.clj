@@ -12,7 +12,8 @@
             [clojure.tools.logging :as log :refer [spy spyf]]
             [adzerk.env :refer [env]]
             [<<project-ns>>.core :as core]
-            [<<project-ns>>.system :as system]))
+            [<<project-ns>>.system :as system]
+            [<<project-ns>>.utils :as utils]))
 
 (defn config
   "Pretty print the system status"
@@ -29,7 +30,8 @@
 (def stop system/stop)
 
 (defn go []
-  (start)
+  (utils/safely (start)
+                #(log/error % "Error in dev/go"))
   :ready)
 
 (defn test-all []
