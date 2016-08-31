@@ -51,7 +51,7 @@
 ;; All the deps are "test" because they are only need for compiling to
 ;; JavaScript, not "real" project dependencies.
 (def frontend-deps (into common-deps
-                         '[[org.clojure/clojurescript "1.9.76" :scope "test"]
+                         '[[org.clojure/clojurescript "1.9.227" :scope "test"]
                            [adzerk/cljs-console "0.1.1" :scope "test" :exclusions [adzerk/env]]
                            ;; dev only
                            [adzerk/boot-cljs "1.7.228-1" :scope "test"]
