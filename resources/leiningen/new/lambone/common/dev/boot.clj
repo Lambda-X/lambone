@@ -71,9 +71,9 @@
     [org.clojure/tools.nrepl "0.2.12" :scope "test"]])
 
 (def dirac-repl-deps
-  '[[binaryage/devtools "0.8.0" :scope "test"]
-    [binaryage/dirac "0.6.3" :scope "test"]
-    [powerlaces/boot-cljs-devtools "0.1.1" :scope "test"]])
+  '[[binaryage/devtools "0.8.2" :scope "test"]
+    [binaryage/dirac "0.7.1" :scope "test"]
+    [powerlaces/boot-cljs-devtools "0.1.2" :scope "test"]])
 
 (defn add-repl-deps
   [options dirac]
